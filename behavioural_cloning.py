@@ -35,7 +35,6 @@ parser.add_argument("--EPOCHS", required=True, type=int, help="Parameter",defaul
 parser.add_argument("--BATCH_SIZE", required=True, type=int, help="Parameter",default=8)
 parser.add_argument("--N_WORKERS", required=True, type=int, help="Parameter",default=12)
 parser.add_argument("--DEVICE", required=True, type=str, help="Parameter",default="cuda")
-parser.add_argument("--EPOCHS", required=True, type=int, help="Parameter",default=2)
 
 
 
