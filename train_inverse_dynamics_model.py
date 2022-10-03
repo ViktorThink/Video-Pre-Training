@@ -19,7 +19,9 @@ import minerl
 import torch as th
 import numpy as np
 
-from agent import PI_HEAD_KWARGS, MineRLAgent
+#from agent import PI_HEAD_KWARGS, MineRLAgent
+from inverse_dynamics_model import IDMAgent
+
 from data_loader import DataLoader
 from lib.tree_util import tree_map
 
@@ -66,13 +68,20 @@ def load_model_parameters(path_to_model_file):
     return policy_kwargs, pi_head_kwargs
 
 def behavioural_cloning_train(data_dir, in_model, in_weights, out_weights):
-    agent_policy_kwargs, agent_pi_head_kwargs = load_model_parameters(in_model)
+    # agent_policy_kwargs, agent_pi_head_kwargs = load_model_parameters(in_model)
+    
 
+    
+    
     # To create model with the right environment.
     # All basalt environments have the same settings, so any of them works here
     env = gym.make("MineRLBasaltFindCave-v0")
-    agent = MineRLAgent(env, device=DEVICE, policy_kwargs=agent_policy_kwargs, pi_head_kwargs=agent_pi_head_kwargs)
-    agent.load_weights(in_weights)
+    # agent = MineRLAgent(env, device=DEVICE, policy_kwargs=agent_policy_kwargs, pi_head_kwargs=agent_pi_head_kwargs)
+    # agent.load_weights(in_weights)
+    agent = IDMAgent()
+    agent_policy_kwargs = agent.idm_net_kwargs
+    agent_pi_head_kwargs = agent.pi_head_kwargs
+    
     env.close()
 
     policy = agent.policy
