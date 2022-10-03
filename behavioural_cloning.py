@@ -31,10 +31,10 @@ parser.add_argument("--in-weights", required=True, type=str, help="Path to the .
 parser.add_argument("--out-weights", required=True, type=str, help="Path where finetuned weights will be saved")
 
 
-parser.add_argument("--EPOCHS", required=True, type=int, help="Parameter",default=2)
-parser.add_argument("--BATCH_SIZE", required=True, type=int, help="Parameter",default=8)
-parser.add_argument("--N_WORKERS", required=True, type=int, help="Parameter",default=12)
-parser.add_argument("--DEVICE", required=True, type=str, help="Parameter",default="cuda")
+parser.add_argument("--EPOCHS", required=False, type=int, help="Parameter",default=2)
+parser.add_argument("--BATCH_SIZE", required=False, type=int, help="Parameter",default=8)
+parser.add_argument("--N_WORKERS", required=False, type=int, help="Parameter",default=12)
+parser.add_argument("--DEVICE", required=False, type=str, help="Parameter",default="cuda")
 
 
 
