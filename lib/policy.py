@@ -418,9 +418,13 @@ class InverseActionPolicy(nn.Module):
         pi_out_size = self.net.output_latent_size()
 
         pi_head_kwargs = {} if pi_head_kwargs is None else pi_head_kwargs
-
+        
+        self.value_head = self.make_value_head(self.net.output_latent_size())
         self.pi_head = self.make_action_head(pi_out_size=pi_out_size, **pi_head_kwargs)
-
+        
+    def make_value_head(self, v_out_size: int, norm_type: str = "ewma", norm_kwargs: Optional[Dict] = None):
+        return ScaledMSEHead(v_out_size, 1, norm_type=norm_type, norm_kwargs=norm_kwargs)
+    
     def make_action_head(self, **kwargs):
         return make_action_head(self.action_space, **kwargs)
 
