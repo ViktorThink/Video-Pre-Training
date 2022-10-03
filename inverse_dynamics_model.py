@@ -99,6 +99,32 @@ class IDMAgent:
         minerl_action_transformed = self.action_transformer.policy2env(minerl_action)
         return minerl_action_transformed
 
+
+
+    def _env_action_to_agent(self, minerl_action_transformed, to_torch=False, check_if_null=False):
+        """
+        Turn action from MineRL to model's action.
+
+        Note that this will add batch dimensions to the action.
+        Returns numpy arrays, unless `to_torch` is True, in which case it returns torch tensors.
+
+        If `check_if_null` is True, check if the action is null (no action) after the initial
+        transformation. This matches the behaviour done in OpenAI's VPT work.
+        If action is null, return "None" instead
+        """
+        minerl_action = self.action_transformer.env2policy(minerl_action_transformed)
+        if check_if_null:
+            if np.all(minerl_action["buttons"] == 0) and np.all(minerl_action["camera"] == self.action_transformer.camera_zero_bin):
+                return None
+
+        # Add batch dims if not existant
+        if minerl_action["camera"].ndim == 1:
+            minerl_action = {k: v[None] for k, v in minerl_action.items()}
+        action = self.action_mapper.from_factored(minerl_action)
+        if to_torch:
+            action = {k: th.from_numpy(v).to(self.device) for k, v in action.items()}
+        return action
+    
     def predict_actions(self, video_frames):
         """
         Predict actions for a sequence of frames.
