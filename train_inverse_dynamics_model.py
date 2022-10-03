@@ -78,7 +78,7 @@ def behavioural_cloning_train(data_dir, in_model, in_weights, out_weights):
     env = gym.make("MineRLBasaltFindCave-v0")
     # agent = MineRLAgent(env, device=DEVICE, policy_kwargs=agent_policy_kwargs, pi_head_kwargs=agent_pi_head_kwargs)
     # agent.load_weights(in_weights)
-    agent = IDMAgent()
+    agent = IDMAgent(device=DEVICE)
     agent_policy_kwargs = agent.idm_net_kwargs
     agent_pi_head_kwargs = agent.pi_head_kwargs
     
