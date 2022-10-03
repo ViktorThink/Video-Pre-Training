@@ -99,7 +99,15 @@ class IDMAgent:
         minerl_action_transformed = self.action_transformer.policy2env(minerl_action)
         return minerl_action_transformed
 
+    def _env_obs_to_agent(self, minerl_obs):
+        """
+        Turn observation from MineRL environment into model's observation
 
+        Returns torch tensors.
+        """
+        agent_input = resize_image(minerl_obs["pov"], AGENT_RESOLUTION)[None]
+        agent_input = {"img": th.from_numpy(agent_input).to(self.device)}
+        return agent_input
 
     def _env_action_to_agent(self, minerl_action_transformed, to_torch=False, check_if_null=False):
         """
