@@ -23,35 +23,15 @@ from agent import PI_HEAD_KWARGS, MineRLAgent
 from data_loader import DataLoader
 from lib.tree_util import tree_map
 
-
-parser = ArgumentParser()
-parser.add_argument("--data-dir", type=str, required=True, help="Path to the directory containing recordings to be trained on")
-parser.add_argument("--in-model", required=True, type=str, help="Path to the .model file to be finetuned")
-parser.add_argument("--in-weights", required=True, type=str, help="Path to the .weights file to be finetuned")
-parser.add_argument("--out-weights", required=True, type=str, help="Path where finetuned weights will be saved")
-
-
-parser.add_argument("--EPOCHS", required=True, type=int, help="Parameter",default=2)
-parser.add_argument("--BATCH_SIZE", required=True, type=int, help="Parameter",default=8)
-parser.add_argument("--N_WORKERS", required=True, type=int, help="Parameter",default=12)
-parser.add_argument("--DEVICE", required=True, type=str, help="Parameter",default="cuda")
-parser.add_argument("--EPOCHS", required=True, type=int, help="Parameter",default=2)
-
-
-
-
-args = parser.parse_args()
-
-
-EPOCHS = args.EPOCHS
+EPOCHS = 2
 # Needs to be <= number of videos
-BATCH_SIZE = args.BATCH_SIZE
+BATCH_SIZE = 8
 # Ideally more than batch size to create
 # variation in datasets (otherwise, you will
 # get a bunch of consecutive samples)
 # Decrease this (and batch_size) if you run out of memory
-N_WORKERS = args.N_WORKERS
-DEVICE = args.DEVICE
+N_WORKERS = 12
+DEVICE = "cuda"
 
 LOSS_REPORT_RATE = 100
 
@@ -153,5 +133,11 @@ def behavioural_cloning_train(data_dir, in_model, in_weights, out_weights):
 
 
 if __name__ == "__main__":
+    parser = ArgumentParser()
+    parser.add_argument("--data-dir", type=str, required=True, help="Path to the directory containing recordings to be trained on")
+    parser.add_argument("--in-model", required=True, type=str, help="Path to the .model file to be finetuned")
+    parser.add_argument("--in-weights", required=True, type=str, help="Path to the .weights file to be finetuned")
+    parser.add_argument("--out-weights", required=True, type=str, help="Path where finetuned weights will be saved")
 
+    args = parser.parse_args()
     behavioural_cloning_train(args.data_dir, args.in_model, args.in_weights, args.out_weights)
