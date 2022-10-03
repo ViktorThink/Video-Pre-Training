@@ -432,6 +432,7 @@ class InverseActionPolicy(nn.Module):
         super().reset_parameters()
         self.net.reset_parameters()
         self.pi_head.reset_parameters()
+        self.value_head.reset_parameters()
 
     def forward(self, obs, first: th.Tensor, state_in, **kwargs):
         if isinstance(obs, dict):
