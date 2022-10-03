@@ -465,3 +465,23 @@ class InverseActionPolicy(nn.Module):
 
     def initial_state(self, batch_size: int):
         return self.net.initial_state(batch_size)
+
+    def get_output_for_observation(self, obs, state_in, first):
+        """
+        Return gradient-enabled outputs for given observation.
+
+        Use `get_logprob_of_action` to get log probability of action
+        with the given probability distribution.
+
+        Returns:
+          - probability distribution given observation
+          - value prediction for given observation
+          - new state
+        """
+        # We need to add a fictitious time dimension everywhere
+        obs = tree_map(lambda x: x.unsqueeze(1), obs)
+        first = first.unsqueeze(1)
+
+        (pd, vpred, _), state_out = self(obs=obs, first=first, state_in=state_in)
+
+        return pd, self.value_head.denormalize(vpred)[:, 0], state_out
