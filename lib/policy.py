@@ -489,4 +489,4 @@ class InverseActionPolicy(nn.Module):
 
         (pd, vpred, _), state_out = self(obs=obs, first=first, state_in=state_in)
 
-        return pd, self.value_head.denormalize(vpred)[:, 0], state_out
+        return pd, None, state_out
