@@ -490,3 +490,13 @@ class InverseActionPolicy(nn.Module):
         (pd, vpred, _), state_out = self(obs=obs, first=first, state_in=state_in)
 
         return pd, None, state_out
+    
+    def get_logprob_of_action(self, pd, action):
+        """
+        Get logprob of taking action `action` given probability distribution
+        (see `get_gradient_for_action` to get this distribution)
+        """
+        ac = tree_map(lambda x: x.unsqueeze(1), action)
+        log_prob = self.pi_head.logprob(ac, pd)
+        assert not th.isnan(log_prob).any()
+        return log_prob[:, 0]
