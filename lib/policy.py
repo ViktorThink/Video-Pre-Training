@@ -267,9 +267,8 @@ class MinecraftAgentPolicyBidirectional(nn.Module):
             mask = None
 
         (pi_h, v_h), state_out = self.net(obs, state_in, context={"first": first})
-        print("pi_h",pi_h)
-        print("first",v_h)
-        raise
+        v_h = pi_h
+
         pi_logits = self.pi_head(pi_h, mask=mask)
         vpred = self.value_head(v_h)
 
