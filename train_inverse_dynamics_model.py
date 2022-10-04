@@ -82,6 +82,7 @@ def behavioural_cloning_train(data_dir, in_model, in_weights, out_weights):
     print("Agent created")
     print(type(agent))
     print(agent)
+    print(agent.policy)
     agent._agent_action_to_env
     agent_policy_kwargs = agent.idm_net_kwargs
     agent_pi_head_kwargs = agent.pi_head_kwargs
@@ -118,7 +119,7 @@ def behavioural_cloning_train(data_dir, in_model, in_weights, out_weights):
     for batch_i, (batch_images, batch_actions, batch_episode_id) in enumerate(data_loader):
         batch_loss = 0
         for image, action, episode_id in zip(batch_images, batch_actions, batch_episode_id):
-            agent_action = agent._video_obs_to_agent(action, to_torch=True, check_if_null=True)
+            agent_action = agent._env_action_to_agent(action, to_torch=True, check_if_null=True)
             if agent_action is None:
                 # Action was null
                 continue
