@@ -371,9 +371,9 @@ class MinecraftAgentPolicy(nn.Module):
         self.value_head.reset_parameters()
 
     def forward(self, obs, first: th.Tensor, state_in):
-        print("Obs",obs)
-        print("first",first)
-        print("state_in",state_in)
+        # print("Obs",obs)
+        # print("first",first)
+        # print("state_in",state_in)
         if isinstance(obs, dict):
             # We don't want to mutate the obs input.
             obs = obs.copy()
@@ -386,9 +386,9 @@ class MinecraftAgentPolicy(nn.Module):
             mask = None
 
         (pi_h, v_h), state_out = self.net(obs, state_in, context={"first": first})
-        print("pi_h",pi_h)
-        print("first",v_h)
-        raise
+        # print("pi_h",pi_h)
+        # print("first",v_h)
+        # raise
         pi_logits = self.pi_head(pi_h, mask=mask)
         vpred = self.value_head(v_h)
 
