@@ -494,8 +494,11 @@ class InverseActionNet(MinecraftPolicy):
                'kernel_size': [5, 1, 1],
                'outchan': 128,
                'padding': [2, 0, 0]}
+        print("conv3d")
+        print(conv3d_params)
         
         if conv3d_params is not None:
+            print("Adding 3d")
             # 3D conv is the first layer, so don't normalize its input
             conv3d_init_params = deepcopy(self.init_norm_kwargs)
             conv3d_init_params["group_norm_groups"] = None
