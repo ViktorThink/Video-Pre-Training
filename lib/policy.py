@@ -224,6 +224,121 @@ class MinecraftPolicy(nn.Module):
             return None
 
 
+class MinecraftAgentPolicyBidirectional(nn.Module):
+    def __init__(self, action_space, policy_kwargs, pi_head_kwargs):
+        super().__init__()
+        self.net = InverseActionNet(**policy_kwargs)
+
+        self.action_space = action_space
+
+        self.value_head = self.make_value_head(self.net.output_latent_size())
+        self.pi_head = self.make_action_head(self.net.output_latent_size(), **pi_head_kwargs)
+
+    def make_value_head(self, v_out_size: int, norm_type: str = "ewma", norm_kwargs: Optional[Dict] = None):
+        return ScaledMSEHead(v_out_size, 1, norm_type=norm_type, norm_kwargs=norm_kwargs)
+
+    def make_action_head(self, pi_out_size: int, **pi_head_opts):
+        return make_action_head(self.action_space, pi_out_size, **pi_head_opts)
+
+    def initial_state(self, batch_size: int):
+        return self.net.initial_state(batch_size)
+
+    def reset_parameters(self):
+        super().reset_parameters()
+        self.net.reset_parameters()
+        self.pi_head.reset_parameters()
+        self.value_head.reset_parameters()
+
+    def forward(self, obs, first: th.Tensor, state_in):
+        if isinstance(obs, dict):
+            # We don't want to mutate the obs input.
+            obs = obs.copy()
+
+            # If special "mask" key is in obs,
+            # It's for masking the logits.
+            # We take it out (the network doesn't need it)
+            mask = obs.pop("mask", None)
+        else:
+            mask = None
+
+        (pi_h, v_h), state_out = self.net(obs, state_in, context={"first": first})
+
+        pi_logits = self.pi_head(pi_h, mask=mask)
+        vpred = self.value_head(v_h)
+
+        return (pi_logits, vpred, None), state_out
+
+    def get_logprob_of_action(self, pd, action):
+        """
+        Get logprob of taking action `action` given probability distribution
+        (see `get_gradient_for_action` to get this distribution)
+        """
+        ac = tree_map(lambda x: x.unsqueeze(1), action)
+        log_prob = self.pi_head.logprob(ac, pd)
+        assert not th.isnan(log_prob).any()
+        return log_prob[:, 0]
+
+    def get_kl_of_action_dists(self, pd1, pd2):
+        """
+        Get the KL divergence between two action probability distributions
+        """
+        return self.pi_head.kl_divergence(pd1, pd2)
+
+    def get_output_for_observation(self, obs, state_in, first):
+        """
+        Return gradient-enabled outputs for given observation.
+
+        Use `get_logprob_of_action` to get log probability of action
+        with the given probability distribution.
+
+        Returns:
+          - probability distribution given observation
+          - value prediction for given observation
+          - new state
+        """
+        # We need to add a fictitious time dimension everywhere
+        obs = tree_map(lambda x: x.unsqueeze(1), obs)
+        first = first.unsqueeze(1)
+
+        (pd, vpred, _), state_out = self(obs=obs, first=first, state_in=state_in)
+
+        return pd, self.value_head.denormalize(vpred)[:, 0], state_out
+
+    @th.no_grad()
+    def act(self, obs, first, state_in, stochastic: bool = True, taken_action=None, return_pd=False):
+        # We need to add a fictitious time dimension everywhere
+        obs = tree_map(lambda x: x.unsqueeze(1), obs)
+        first = first.unsqueeze(1)
+
+        (pd, vpred, _), state_out = self(obs=obs, first=first, state_in=state_in)
+
+        if taken_action is None:
+            ac = self.pi_head.sample(pd, deterministic=not stochastic)
+        else:
+            ac = tree_map(lambda x: x.unsqueeze(1), taken_action)
+        log_prob = self.pi_head.logprob(ac, pd)
+        assert not th.isnan(log_prob).any()
+
+        # After unsqueezing, squeeze back to remove fictitious time dimension
+        result = {"log_prob": log_prob[:, 0], "vpred": self.value_head.denormalize(vpred)[:, 0]}
+        if return_pd:
+            result["pd"] = tree_map(lambda x: x[:, 0], pd)
+        ac = tree_map(lambda x: x[:, 0], ac)
+
+        return ac, state_out, result
+
+    @th.no_grad()
+    def v(self, obs, first, state_in):
+        """Predict value for a given mdp observation"""
+        obs = tree_map(lambda x: x.unsqueeze(1), obs)
+        first = first.unsqueeze(1)
+
+        (pd, vpred, _), state_out = self(obs=obs, first=first, state_in=state_in)
+
+        # After unsqueezing, squeeze back
+        return self.value_head.denormalize(vpred)[:, 0]
+
+
 class MinecraftAgentPolicy(nn.Module):
     def __init__(self, action_space, policy_kwargs, pi_head_kwargs):
         super().__init__()
