@@ -186,6 +186,7 @@ class MinecraftPolicy(nn.Module):
 
         self.lastlayer = FanInInitReLULayer(hidsize, hidsize, layer_type="linear", **self.dense_init_norm_kwargs)
         self.final_ln = th.nn.LayerNorm(hidsize)
+        
 
     def output_latent_size(self):
         return self.hidsize
@@ -234,6 +235,9 @@ class MinecraftAgentPolicyBidirectional(nn.Module):
 
         self.value_head = self.make_value_head(self.net.output_latent_size())
         self.pi_head = self.make_action_head(self.net.output_latent_size(), **pi_head_kwargs)
+        
+
+        
 
     def make_value_head(self, v_out_size: int, norm_type: str = "ewma", norm_kwargs: Optional[Dict] = None):
         return ScaledMSEHead(v_out_size, 1, norm_type=norm_type, norm_kwargs=norm_kwargs)
@@ -485,6 +489,12 @@ class InverseActionNet(MinecraftPolicy):
             **MCPoliy_kwargs,
         )
         self.conv3d_layer = None
+        if conv3d_params is None:
+            conv3d_params: {'inchan': 3,
+               'kernel_size': [5, 1, 1],
+               'outchan': 128,
+               'padding': [2, 0, 0]}
+        
         if conv3d_params is not None:
             # 3D conv is the first layer, so don't normalize its input
             conv3d_init_params = deepcopy(self.init_norm_kwargs)
