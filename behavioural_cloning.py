@@ -76,6 +76,8 @@ def behavioural_cloning_train(data_dir, in_model, in_weights, out_weights):
     env.close()
 
     policy = agent.policy
+    print(agent)
+    print(agent.policy)
     trainable_parameters = policy.parameters()
 
     # Parameters taken from the OpenAI VPT paper
