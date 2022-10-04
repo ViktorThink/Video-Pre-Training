@@ -192,6 +192,11 @@ class MinecraftPolicy(nn.Module):
 
     def forward(self, ob, state_in, context):
         first = context["first"]
+        
+        print("Obs",ob)
+        print("first",first)
+        print("state_in",state_in)
+        raise
 
         x = self.img_preprocess(ob["img"])
         x = self.img_process(x)
@@ -250,6 +255,10 @@ class MinecraftAgentPolicyBidirectional(nn.Module):
         self.value_head.reset_parameters()
 
     def forward(self, obs, first: th.Tensor, state_in):
+        print("Obs",obs)
+        print("first",first)
+        print("state_in",state_in)
+        raise
         if isinstance(obs, dict):
             # We don't want to mutate the obs input.
             obs = obs.copy()
