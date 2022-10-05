@@ -91,3 +91,23 @@ class IDMAgent:
         )
         predicted_minerl_action = self._agent_action_to_env(predicted_actions)
         return predicted_minerl_action
+    
+    def predict_actions_training(self, video_frames):
+        """
+        Predict actions for a sequence of frames.
+        `video_frames` should be of shape (N, H, W, C).
+        Returns MineRL action dict, where each action head
+        has shape (N, ...).
+        Agent's hidden state is tracked internally. To reset it,
+        call `reset()`.
+        """
+        agent_input = self._video_obs_to_agent(video_frames)
+        # The "first" argument could be used to reset tell episode
+        # boundaries, but we are only using this for predicting (for now),
+        # so we do not hassle with it yet.
+        dummy_first = th.zeros((video_frames.shape[0], 1)).to(self.device)
+        predicted_actions, self.hidden_state, _ = self.policy.predict(
+            agent_input, first=dummy_first, state_in=self.hidden_state,
+            deterministic=True
+        )
+        return predicted_actions
