@@ -132,7 +132,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
     pi_head_kwargs = agent_parameters["model"]["args"]["pi_head_opts"]
     pi_head_kwargs["temperature"] = float(pi_head_kwargs["temperature"])
     agent = IDMAgent(idm_net_kwargs=net_kwargs, pi_head_kwargs=pi_head_kwargs)
-    #agent.load_weights(weights)
+    agent.load_weights(weights)
 
     required_resolution = ENV_KWARGS["resolution"]
     cap = cv2.VideoCapture(video_path)
