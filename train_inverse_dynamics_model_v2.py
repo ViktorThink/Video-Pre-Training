@@ -173,7 +173,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
         button_action_tensor=[]
         camera_action_tensor=[]
         
-        recorded_buttons_keys = [a for a in recorded_actions.keys()]
+        recorded_buttons_keys = [a for a in recorded_actions[0].keys()]
         del recorded_buttons_keys["camera"]
         
         for i in range(n_frames):
