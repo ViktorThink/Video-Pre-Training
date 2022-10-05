@@ -161,7 +161,10 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
         frames = np.stack(frames)
         print("=== Predicting actions ===")
         predicted_actions = agent.predict_actions(frames)
-        print(predicted_actions)
+        keys = [a for a in predicted_actions.keys()]
+        print("predicted_actions keys",keys)
+        print("predicted_actions",predicted_actions)
+
 
         for i in range(n_frames):
             frame = frames[i]
@@ -176,7 +179,10 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
                 1
             )
             for y, (action_name, action_array) in enumerate(predicted_actions.items()):
+                print("action_name",action_name)
                 current_prediction = action_array[0, i]
+                print("current_prediction",current_prediction)
+                print("recorded_action[action_name]",recorded_action[action_name])
                 cv2.putText(
                     frame,
                     f"{action_name}: {current_prediction} ({recorded_action[action_name]})",
