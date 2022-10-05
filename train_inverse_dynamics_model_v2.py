@@ -162,12 +162,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
         print("=== Predicting actions ===")
         predicted_actions = agent.predict_actions_training(frames)
         keys = [a for a in predicted_actions.keys()]
-        if _ == 0:
-            print("predicted_actions",keys)
-            print("predicted_actions",predicted_actions)
-            print("\n\camera",predicted_actions["camera"].shape)
-            print("\n\camera",predicted_actions["camera"][0])
-            print("recorded_actions[0]",recorded_actions[0])
+
             
         
         loss = 0
@@ -185,7 +180,10 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
                 frame_buttons.append(recorded_actions[i][key])
             button_action_tensor.append(frame_buttons)
             
+
         if _ == 0:
+            print("predicted_actions",keys)
+            print("predicted_actions",predicted_actions)
             print("\n\ncamera_action_tensor",camera_action_tensor)
             print("\n\button_action_tensor",button_action_tensor)
         raise
