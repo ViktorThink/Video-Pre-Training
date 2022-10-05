@@ -489,13 +489,13 @@ class InverseActionNet(MinecraftPolicy):
             **MCPoliy_kwargs,
         )
         self.conv3d_layer = None
-        if conv3d_params is None:
-            conv3d_params =  {'inchan': 3,
-               'kernel_size': [5, 1, 1],
-               'outchan': 128,
-               'padding': [2, 0, 0]}
-        print("conv3d")
-        print(conv3d_params)
+        # if conv3d_params is None:
+        #     conv3d_params =  {'inchan': 3,
+        #        'kernel_size': [5, 1, 1],
+        #        'outchan': 128,
+        #        'padding': [2, 0, 0]}
+        # print("conv3d")
+        # print(conv3d_params)
         
         if conv3d_params is not None:
             print("Adding 3d")

@@ -21,9 +21,38 @@ ACTION_TRANSFORMER_KWARGS = dict(
 class IDMAgent:
     """
     Sugarcoating on the inverse dynamics model (IDM) used to predict actions Minecraft players take in videos.
+
     Functionally same as MineRLAgent.
     """
-    def __init__(self, idm_net_kwargs, pi_head_kwargs, device=None):
+    def __init__(self, idm_net_kwargs=None, pi_head_kwargs={'temperature': 4.0}, device=None):
+        if idm_net_kwargs == None:
+            idm_net_kwargs = {'attention_heads': 32,
+                 'attention_mask_style': 'none',
+                 'attention_memory_size': 128,
+                 'conv3d_params': {'inchan': 3,
+                    'kernel_size': [5, 1, 1],
+                    'outchan': 128,
+                    'padding': [2, 0, 0]},
+                 'hidsize': 4096,
+                 'img_shape': [128, 128, 128],
+                 'impala_kwargs': {'post_pool_groups': 1},
+                 'impala_width': 16,
+                 'init_norm_kwargs': {'batch_norm': False, 'group_norm_groups': 1},
+                 'n_recurrence_layers': 2,
+                 'only_img_input': True,
+                 'pointwise_ratio': 4,
+                 'pointwise_use_activation': False,
+                 'recurrence_is_residual': True,
+                 'recurrence_type': 'transformer',
+                 'single_output': True,
+                 'timesteps': 128,
+                 'use_pointwise_layer': True,
+                 'use_pre_lstm_ln': False}
+        
+        self.idm_net_kwargs = idm_net_kwargs
+        self.pi_head_kwargs = pi_head_kwargs
+        
+        
         if device is None:
             device = default_device_type()
         self.device = th.device(device)
@@ -70,12 +99,48 @@ class IDMAgent:
         minerl_action_transformed = self.action_transformer.policy2env(minerl_action)
         return minerl_action_transformed
 
+    def _env_obs_to_agent(self, minerl_obs):
+        """
+        Turn observation from MineRL environment into model's observation
+
+        Returns torch tensors.
+        """
+        agent_input = resize_image(minerl_obs["pov"], AGENT_RESOLUTION)[None]
+        agent_input = {"img": th.from_numpy(agent_input).to(self.device)}
+        return agent_input
+
+    def _env_action_to_agent(self, minerl_action_transformed, to_torch=False, check_if_null=False):
+        """
+        Turn action from MineRL to model's action.
+
+        Note that this will add batch dimensions to the action.
+        Returns numpy arrays, unless `to_torch` is True, in which case it returns torch tensors.
+
+        If `check_if_null` is True, check if the action is null (no action) after the initial
+        transformation. This matches the behaviour done in OpenAI's VPT work.
+        If action is null, return "None" instead
+        """
+        minerl_action = self.action_transformer.env2policy(minerl_action_transformed)
+        if check_if_null:
+            if np.all(minerl_action["buttons"] == 0) and np.all(minerl_action["camera"] == self.action_transformer.camera_zero_bin):
+                return None
+
+        # Add batch dims if not existant
+        if minerl_action["camera"].ndim == 1:
+            minerl_action = {k: v[None] for k, v in minerl_action.items()}
+        action = self.action_mapper.from_factored(minerl_action)
+        if to_torch:
+            action = {k: th.from_numpy(v).to(self.device) for k, v in action.items()}
+        return action
+    
     def predict_actions(self, video_frames):
         """
         Predict actions for a sequence of frames.
+
         `video_frames` should be of shape (N, H, W, C).
         Returns MineRL action dict, where each action head
         has shape (N, ...).
+
         Agent's hidden state is tracked internally. To reset it,
         call `reset()`.
         """
