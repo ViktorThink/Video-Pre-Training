@@ -187,7 +187,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
                     1
                 )
             # RGB -> BGR again...
-            cv2.imshow("MineRL IDM model predictions", frame[..., ::-1])
+            # cv2.imshow("MineRL IDM model predictions", frame[..., ::-1])
             cv2.waitKey(0)
     cv2.destroyAllWindows()
 
