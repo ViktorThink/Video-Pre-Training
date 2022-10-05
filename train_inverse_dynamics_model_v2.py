@@ -171,6 +171,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
         
         loss = 0
         for i in range(n_frames):
+            pass
             
         
 
