@@ -164,6 +164,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
         keys = [a for a in predicted_actions.keys()]
         print("predicted_actions keys",keys)
         print("predicted_actions",predicted_actions)
+        print("\n\camera",predicted_actions["camera"].shape)
 
 
         for i in range(n_frames):
@@ -179,10 +180,10 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
                 1
             )
             for y, (action_name, action_array) in enumerate(predicted_actions.items()):
-                print("action_name",action_name)
-                current_prediction = action_array[0, i]
-                print("current_prediction",current_prediction)
-                print("recorded_action[action_name]",recorded_action[action_name])
+                # print("action_name",action_name)
+                # current_prediction = action_array[0, i]
+                # print("current_prediction",current_prediction)
+                # print("recorded_action[action_name]",recorded_action[action_name])
                 cv2.putText(
                     frame,
                     f"{action_name}: {current_prediction} ({recorded_action[action_name]})",
