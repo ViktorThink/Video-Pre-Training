@@ -1,170 +1,206 @@
-# Basic behavioural cloning
-# Note: this uses gradient accumulation in batches of ones
-#       to perform training.
-#       This will fit inside even smaller GPUs (tested on 8GB one),
-#       but is slow.
-# NOTE: This is _not_ the original code used for VPT!
-#       This is merely to illustrate how to fine-tune the models and includes
-#       the processing steps used.
-
-# This will likely be much worse than what original VPT did:
-# we are not training on full sequences, but only one step at a time to save VRAM.
+# NOTE: this is _not_ the original code of IDM!
+# As such, while it is close and seems to function well,
+# its performance might be bit off from what is reported
+# in the paper.
 
 from argparse import ArgumentParser
 import pickle
-import time
-
-import gym
-import minerl
-import torch as th
+import cv2
 import numpy as np
+import json
+import torch as th
 
-#from agent import PI_HEAD_KWARGS, MineRLAgent
+from agent import ENV_KWARGS
 from inverse_dynamics_model import IDMAgent
 
-from data_loader import DataLoader
-from lib.tree_util import tree_map
+
+KEYBOARD_BUTTON_MAPPING = {
+    "key.keyboard.escape" :"ESC",
+    "key.keyboard.s" :"back",
+    "key.keyboard.q" :"drop",
+    "key.keyboard.w" :"forward",
+    "key.keyboard.1" :"hotbar.1",
+    "key.keyboard.2" :"hotbar.2",
+    "key.keyboard.3" :"hotbar.3",
+    "key.keyboard.4" :"hotbar.4",
+    "key.keyboard.5" :"hotbar.5",
+    "key.keyboard.6" :"hotbar.6",
+    "key.keyboard.7" :"hotbar.7",
+    "key.keyboard.8" :"hotbar.8",
+    "key.keyboard.9" :"hotbar.9",
+    "key.keyboard.e" :"inventory",
+    "key.keyboard.space" :"jump",
+    "key.keyboard.a" :"left",
+    "key.keyboard.d" :"right",
+    "key.keyboard.left.shift" :"sneak",
+    "key.keyboard.left.control" :"sprint",
+    "key.keyboard.f" :"swapHands",
+}
+
+# Template action
+NOOP_ACTION = {
+    "ESC": 0,
+    "back": 0,
+    "drop": 0,
+    "forward": 0,
+    "hotbar.1": 0,
+    "hotbar.2": 0,
+    "hotbar.3": 0,
+    "hotbar.4": 0,
+    "hotbar.5": 0,
+    "hotbar.6": 0,
+    "hotbar.7": 0,
+    "hotbar.8": 0,
+    "hotbar.9": 0,
+    "inventory": 0,
+    "jump": 0,
+    "left": 0,
+    "right": 0,
+    "sneak": 0,
+    "sprint": 0,
+    "swapHands": 0,
+    "camera": np.array([0, 0]),
+    "attack": 0,
+    "use": 0,
+    "pickItem": 0,
+}
+
+MESSAGE = """
+This script will take a video, predict actions for its frames and
+and show them with a cv2 window.
+
+Press any button the window to proceed to the next frame.
+"""
+
+# Matches a number in the MineRL Java code regarding sensitivity
+# This is for mapping from recorded sensitivity to the one used in the model
+CAMERA_SCALER = 360.0 / 2400.0
 
 
-parser = ArgumentParser()
-parser.add_argument("--data-dir", type=str, required=True, help="Path to the directory containing recordings to be trained on")
-parser.add_argument("--in-model", required=True, type=str, help="Path to the .model file to be finetuned")
-parser.add_argument("--in-weights", required=True, type=str, help="Path to the .weights file to be finetuned")
-parser.add_argument("--out-weights", required=True, type=str, help="Path where finetuned weights will be saved")
+def json_action_to_env_action(json_action):
+    """
+    Converts a json action into a MineRL action.
+    Returns (minerl_action, is_null_action)
+    """
+    # This might be slow...
+    env_action = NOOP_ACTION.copy()
+    # As a safeguard, make camera action again so we do not override anything
+    env_action["camera"] = np.array([0, 0])
+
+    is_null_action = True
+    keyboard_keys = json_action["keyboard"]["keys"]
+    for key in keyboard_keys:
+        # You can have keys that we do not use, so just skip them
+        # NOTE in original training code, ESC was removed and replaced with
+        #      "inventory" action if GUI was open.
+        #      Not doing it here, as BASALT uses ESC to quit the game.
+        if key in KEYBOARD_BUTTON_MAPPING:
+            env_action[KEYBOARD_BUTTON_MAPPING[key]] = 1
+            is_null_action = False
+
+    mouse = json_action["mouse"]
+    camera_action = env_action["camera"]
+    camera_action[0] = mouse["dy"] * CAMERA_SCALER
+    camera_action[1] = mouse["dx"] * CAMERA_SCALER
+
+    if mouse["dx"] != 0 or mouse["dy"] != 0:
+        is_null_action = False
+    else:
+        if abs(camera_action[0]) > 180:
+            camera_action[0] = 0
+        if abs(camera_action[1]) > 180:
+            camera_action[1] = 0
+
+    mouse_buttons = mouse["buttons"]
+    if 0 in mouse_buttons:
+        env_action["attack"] = 1
+        is_null_action = False
+    if 1 in mouse_buttons:
+        env_action["use"] = 1
+        is_null_action = False
+    if 2 in mouse_buttons:
+        env_action["pickItem"] = 1
+        is_null_action = False
+
+    return env_action, is_null_action
 
 
-parser.add_argument("--EPOCHS", required=False, type=int, help="Parameter",default=2)
-parser.add_argument("--BATCH_SIZE", required=False, type=int, help="Parameter",default=8)
-parser.add_argument("--N_WORKERS", required=False, type=int, help="Parameter",default=12)
-parser.add_argument("--DEVICE", required=False, type=str, help="Parameter",default="cuda")
-
-
-
-
-args = parser.parse_args()
-
-
-EPOCHS = args.EPOCHS
-# Needs to be <= number of videos
-BATCH_SIZE = args.BATCH_SIZE
-# Ideally more than batch size to create
-# variation in datasets (otherwise, you will
-# get a bunch of consecutive samples)
-# Decrease this (and batch_size) if you run out of memory
-N_WORKERS = args.N_WORKERS
-DEVICE = args.DEVICE
-
-LOSS_REPORT_RATE = 100
-
-LEARNING_RATE = 0.000181
-WEIGHT_DECAY = 0.039428
-MAX_GRAD_NORM = 5.0
-
-def load_model_parameters(path_to_model_file):
-    agent_parameters = pickle.load(open(path_to_model_file, "rb"))
-    policy_kwargs = agent_parameters["model"]["args"]["net"]["args"]
+def main(model, weights, video_path, json_path, n_batches, n_frames):
+    print(MESSAGE)
+    agent_parameters = pickle.load(open(model, "rb"))
+    net_kwargs = agent_parameters["model"]["args"]["net"]["args"]
     pi_head_kwargs = agent_parameters["model"]["args"]["pi_head_opts"]
     pi_head_kwargs["temperature"] = float(pi_head_kwargs["temperature"])
-    return policy_kwargs, pi_head_kwargs
+    agent = IDMAgent(idm_net_kwargs=net_kwargs, pi_head_kwargs=pi_head_kwargs)
+    #agent.load_weights(weights)
 
-def behavioural_cloning_train(data_dir, in_model, in_weights, out_weights):
-    # agent_policy_kwargs, agent_pi_head_kwargs = load_model_parameters(in_model)
-    
+    required_resolution = ENV_KWARGS["resolution"]
+    cap = cv2.VideoCapture(video_path)
 
-    
-    
-    # To create model with the right environment.
-    # All basalt environments have the same settings, so any of them works here
-    env = gym.make("MineRLBasaltFindCave-v0")
-    # agent = MineRLAgent(env, device=DEVICE, policy_kwargs=agent_policy_kwargs, pi_head_kwargs=agent_pi_head_kwargs)
-    # agent.load_weights(in_weights)
-    agent = IDMAgent(device=DEVICE)
-    print("Agent created")
-    print(type(agent))
-    print(agent)
-    print(agent.policy)
-    agent._agent_action_to_env
-    agent_policy_kwargs = agent.idm_net_kwargs
-    agent_pi_head_kwargs = agent.pi_head_kwargs
-    
-    env.close()
+    json_index = 0
+    with open(json_path) as json_file:
+        json_lines = json_file.readlines()
+        json_data = "[" + ",".join(json_lines) + "]"
+        json_data = json.loads(json_data)
 
-    policy = agent.policy
-    trainable_parameters = policy.parameters()
+    for _ in range(n_batches):
+        th.cuda.empty_cache()
+        print("=== Loading up frames ===")
+        frames = []
+        recorded_actions = []
+        for _ in range(n_frames):
+            ret, frame = cap.read()
+            if not ret:
+                break
+            assert frame.shape[0] == required_resolution[1] and frame.shape[1] == required_resolution[0], "Video must be of resolution {}".format(required_resolution)
+            # BGR -> RGB
+            frames.append(frame[..., ::-1])
+            env_action, _ = json_action_to_env_action(json_data[json_index])
+            recorded_actions.append(env_action)
+            json_index += 1
+        frames = np.stack(frames)
+        print("=== Predicting actions ===")
+        predicted_actions = agent.predict_actions(frames)
+        print(predicted_actions)
 
-    # Parameters taken from the OpenAI VPT paper
-    optimizer = th.optim.Adam(
-        trainable_parameters,
-        lr=LEARNING_RATE,
-        weight_decay=WEIGHT_DECAY
-    )
-
-    data_loader = DataLoader(
-        dataset_dir=data_dir,
-        n_workers=N_WORKERS,
-        batch_size=BATCH_SIZE,
-        n_epochs=EPOCHS
-    )
-
-    start_time = time.time()
-
-    # Keep track of the hidden state per episode/trajectory.
-    # DataLoader provides unique id for each episode, which will
-    # be different even for the same trajectory when it is loaded
-    # up again
-    episode_hidden_states = {}
-    dummy_first = th.from_numpy(np.array((False,))).to(DEVICE)
-
-    loss_sum = 0
-    for batch_i, (batch_images, batch_actions, batch_episode_id) in enumerate(data_loader):
-        batch_loss = 0
-        for image, action, episode_id in zip(batch_images, batch_actions, batch_episode_id):
-            agent_action = agent._env_action_to_agent(action, to_torch=True, check_if_null=True)
-            if agent_action is None:
-                # Action was null
-                continue
-
-            agent_obs = agent._env_obs_to_agent({"pov": image})
-            if episode_id not in episode_hidden_states:
-                # TODO need to clean up this hidden state after worker is done with the work item.
-                #      Leaks memory, but not tooooo much at these scales (will be a problem later).
-                episode_hidden_states[episode_id] = policy.initial_state(1)
-            agent_state = episode_hidden_states[episode_id]
-
-            pi_distribution, v_prediction, new_agent_state = policy.get_output_for_observation(
-                agent_obs,
-                agent_state,
-                dummy_first
+        for i in range(n_frames):
+            frame = frames[i]
+            recorded_action = recorded_actions[i]
+            cv2.putText(
+                frame,
+                f"name: prediction (true)",
+                (10, 10),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.4,
+                (255, 255, 255),
+                1
             )
-
-            log_prob  = policy.get_logprob_of_action(pi_distribution, agent_action)
-
-            # Make sure we do not try to backprop through sequence
-            # (fails with current accumulation)
-            new_agent_state = tree_map(lambda x: x.detach(), new_agent_state)
-            episode_hidden_states[episode_id] = new_agent_state
-
-            # Finally, update the agent to increase the probability of the
-            # taken action.
-            # Remember to take mean over batch losses
-            loss = -log_prob / BATCH_SIZE
-            batch_loss += loss.item()
-            loss.backward()
-
-        th.nn.utils.clip_grad_norm_(trainable_parameters, MAX_GRAD_NORM)
-        optimizer.step()
-        optimizer.zero_grad()
-
-        loss_sum += batch_loss
-        if batch_i % LOSS_REPORT_RATE == 0:
-            time_since_start = time.time() - start_time
-            print(f"Time: {time_since_start:.2f}, Batches: {batch_i}, Avrg loss: {loss_sum / LOSS_REPORT_RATE:.4f}")
-            loss_sum = 0
-
-    state_dict = policy.state_dict()
-    th.save(state_dict, out_weights)
-
+            for y, (action_name, action_array) in enumerate(predicted_actions.items()):
+                current_prediction = action_array[0, i]
+                cv2.putText(
+                    frame,
+                    f"{action_name}: {current_prediction} ({recorded_action[action_name]})",
+                    (10, 25 + y * 12),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.35,
+                    (255, 255, 255),
+                    1
+                )
+            # RGB -> BGR again...
+            cv2.imshow("MineRL IDM model predictions", frame[..., ::-1])
+            cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 if __name__ == "__main__":
+    parser = ArgumentParser("Run IDM on MineRL recordings.")
 
-    behavioural_cloning_train(args.data_dir, args.in_model, args.in_weights, args.out_weights)
+    parser.add_argument("--weights", type=str, required=True, help="Path to the '.weights' file to be loaded.")
+    parser.add_argument("--model", type=str, required=True, help="Path to the '.model' file to be loaded.")
+    parser.add_argument("--video-path", type=str, required=True, help="Path to a .mp4 file (Minecraft recording).")
+    parser.add_argument("--jsonl-path", type=str, required=True, help="Path to a .jsonl file (Minecraft recording).")
+    parser.add_argument("--n-frames", type=int, default=128, help="Number of frames to process at a time.")
+    parser.add_argument("--n-batches", type=int, default=10, help="Number of batches (n-frames) to process for visualization.")
+
+    args = parser.parse_args()
+
+    main(args.model, args.weights, args.video_path, args.jsonl_path, args.n_batches, args.n_frames)
