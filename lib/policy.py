@@ -606,6 +606,25 @@ class InverseActionPolicy(nn.Module):
         result = {"log_prob": log_prob, "pd": pd}
 
         return ac, state_out, result
+    
+    def predict_train(
+        self,
+        obs,
+        deterministic: bool = True,
+        **kwargs,
+    ):
+        (pd, _, _), state_out = self(obs=obs, **kwargs)
+        
+        return pd, None, None
+
+        ac = self.pi_head.sample(pd, deterministic=deterministic)
+        log_prob = self.pi_head.logprob(ac, pd)
+
+        assert not th.isnan(log_prob).any()
+
+        result = {"log_prob": log_prob, "pd": pd}
+
+        return ac, state_out, result
 
     def initial_state(self, batch_size: int):
         return self.net.initial_state(batch_size)
