@@ -130,6 +130,8 @@ def behavioural_cloning_train(data_dir, in_model, in_weights, out_weights):
                 print("agent_action",agent_action)
                 # print("agent_obs",agent_obs)
                 print("\n\npi_distribution",pi_distribution)
+                print("\n\npi_distribution camera",pi_distribution["camera"].shape)
+                print("\n\npi_distribution buttons",pi_distribution["buttons"].shape)
                 # print("new_agent_state",new_agent_state)
             
 
