@@ -624,7 +624,7 @@ class InverseActionPolicy(nn.Module):
         print("\n\ac",ac)
         print("\n\log_prob",log_prob)
         
-        return pd, None, None
+        # return pd, None, None
 
         assert not th.isnan(log_prob).any()
 

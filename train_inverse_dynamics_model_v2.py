@@ -162,6 +162,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
         print("=== Predicting actions ===")
         predicted_actions = agent.predict_actions_training(frames)
         keys = [a for a in predicted_actions.keys()]
+        print("predictions made")
 
             
         
