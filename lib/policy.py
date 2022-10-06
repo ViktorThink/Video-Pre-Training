@@ -611,7 +611,7 @@ class InverseActionPolicy(nn.Module):
     def predict_train(
         self,
         obs,
-        deterministic: bool = False,
+        deterministic: bool = True,
         **kwargs,
     ):
         (pd, _, _), state_out = self(obs=obs, **kwargs)
@@ -624,7 +624,8 @@ class InverseActionPolicy(nn.Module):
         log_prob= self.pi_head.logprob(ac, pd)
         
         print("ac shape",ac)
-        print("ac shape",ac.shape)
+        print("ac buttons shape",ac["buttons"].shape)
+        print("ac camera shape",ac["camera"].shape)
         print("log_prob",log_prob)
         print("log_prob shape",log_prob.shape)
 
