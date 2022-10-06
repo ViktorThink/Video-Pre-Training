@@ -616,7 +616,8 @@ class InverseActionPolicy(nn.Module):
     ):
         (pd, _, _), state_out = self(obs=obs, **kwargs)
         print("PD",pd)
-        print("Shape",pd.shape)
+        print("Shape buttons",pd["buttons"].shape)
+        print("Shape cameras",pd["cameras"].shape)
         
 
         ac = self.pi_head.sample(pd, deterministic=deterministic)
