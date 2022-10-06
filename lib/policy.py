@@ -621,9 +621,8 @@ class InverseActionPolicy(nn.Module):
         
 
         ac = self.pi_head.sample(pd, deterministic=deterministic)
-        log_prob_old = self.pi_head.logprob(ac, pd)
+        log_prob= self.pi_head.logprob(ac, pd)
         
-        log_prob = self.pi_head(pd, )
         print("ac shape",ac)
         print("ac shape",ac.shape)
         print("log_prob",log_prob)
