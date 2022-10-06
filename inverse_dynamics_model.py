@@ -108,6 +108,6 @@ class IDMAgent:
         dummy_first = th.zeros((video_frames.shape[0], 1)).to(self.device)
         predicted_actions, self.hidden_state, _ = self.policy.predict_train(
             agent_input, first=dummy_first, state_in=self.hidden_state,
-            deterministic=True
+            deterministic=False
         )
         return predicted_actions
