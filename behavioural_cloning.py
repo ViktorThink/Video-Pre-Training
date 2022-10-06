@@ -126,15 +126,15 @@ def behavioural_cloning_train(data_dir, in_model, in_weights, out_weights):
             )
 
                 
-
-            
-
-            log_prob  = policy.get_logprob_of_action(pi_distribution, agent_action)
             if batch_i < 1:
                 print("agent_action",agent_action)
                 # print("agent_obs",agent_obs)
                 print("\n\npi_distribution",pi_distribution)
                 # print("new_agent_state",new_agent_state)
+            
+
+            log_prob  = policy.get_logprob_of_action(pi_distribution, agent_action)
+
 
                 # print("log_prob",log_prob)
             # Make sure we do not try to backprop through sequence

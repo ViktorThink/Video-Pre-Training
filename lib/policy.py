@@ -615,13 +615,15 @@ class InverseActionPolicy(nn.Module):
         **kwargs,
     ):
         (pd, _, _), state_out = self(obs=obs, **kwargs)
-        # print("PD",pd)
-        # print("Shape buttons",pd["buttons"].shape)
-        # print("Shape camera",pd["camera"].shape)
+        print("PD",pd)
+        print("Shape buttons",pd["buttons"].shape)
+        print("Shape camera",pd["camera"].shape)
         
 
         ac = self.pi_head.sample(pd, deterministic=deterministic)
-        log_prob = self.pi_head.logprob(ac, pd)
+        log_prob_old = self.pi_head.logprob(ac, pd)
+        
+        log_prob = self.pi_head(pd, )
         # print("ac shape",ac)
         # print("ac shape",ac.shape)
         print("log_prob",log_prob)
