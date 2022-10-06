@@ -106,8 +106,7 @@ class IDMAgent:
         # boundaries, but we are only using this for predicting (for now),
         # so we do not hassle with it yet.
         dummy_first = th.zeros((video_frames.shape[0], 1)).to(self.device)
-        print("predict action training")
-        predicted_actions, self.hidden_state, _ = self.policy.predict_train(
+        predicted_actions, self.hidden_state, _ = self.policy.predict(
             agent_input, first=dummy_first, state_in=self.hidden_state,
             deterministic=True
         )

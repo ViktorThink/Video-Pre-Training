@@ -162,7 +162,6 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
         print("=== Predicting actions ===")
         predicted_actions = agent.predict_actions_training(frames)
         keys = [a for a in predicted_actions.keys()]
-        print("predictions made")
 
             
         
@@ -191,7 +190,39 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
             
                     
             
-      
+        
+
+
+        for i in range(n_frames):
+            frame = frames[i]
+            recorded_action = recorded_actions[i]
+            cv2.putText(
+                frame,
+                f"name: prediction (true)",
+                (10, 10),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.4,
+                (255, 255, 255),
+                1
+            )
+            for y, (action_name, action_array) in enumerate(predicted_actions.items()):
+                # print("action_name",action_name)
+                current_prediction = action_array[0, i]
+                # print("current_prediction",current_prediction)
+                # print("recorded_action[action_name]",recorded_action[action_name])
+                cv2.putText(
+                    frame,
+                    f"{action_name}: {current_prediction} ({recorded_action[action_name]})",
+                    (10, 25 + y * 12),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.35,
+                    (255, 255, 255),
+                    1
+                )
+            # RGB -> BGR again...
+            # cv2.imshow("MineRL IDM model predictions", frame[..., ::-1])
+            # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     parser = ArgumentParser("Run IDM on MineRL recordings.")

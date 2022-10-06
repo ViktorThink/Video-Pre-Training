@@ -615,16 +615,10 @@ class InverseActionPolicy(nn.Module):
     ):
         (pd, _, _), state_out = self(obs=obs, **kwargs)
         
-        
+        return pd, None, None
 
         ac = self.pi_head.sample(pd, deterministic=deterministic)
         log_prob = self.pi_head.logprob(ac, pd)
-        
-        print("\n\nPD",pd)
-        print("\n\ac",ac)
-        print("\n\log_prob",log_prob)
-        
-        # return pd, None, None
 
         assert not th.isnan(log_prob).any()
 
