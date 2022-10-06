@@ -615,15 +615,16 @@ class InverseActionPolicy(nn.Module):
         **kwargs,
     ):
         (pd, _, _), state_out = self(obs=obs, **kwargs)
-        print("PD",pd)
-        print("Shape buttons",pd["buttons"].shape)
-        print("Shape camera",pd["camera"].shape)
+        # print("PD",pd)
+        # print("Shape buttons",pd["buttons"].shape)
+        # print("Shape camera",pd["camera"].shape)
         
 
         ac = self.pi_head.sample(pd, deterministic=deterministic)
         log_prob = self.pi_head.logprob(ac, pd)
-        print("ac shape",ac)
-        print("ac shape",ac.shape)
+        # print("ac shape",ac)
+        # print("ac shape",ac.shape)
+        print("log_prob",log_prob)
         print("log_prob shape",log_prob.shape)
 
         assert not th.isnan(log_prob).any()
