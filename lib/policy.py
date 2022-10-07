@@ -629,6 +629,7 @@ class InverseActionPolicy(nn.Module):
         
         # print("ac",ac)
         print("ac buttons",ac["buttons"].tolist())
+        print("ac camera",ac["camera"].tolist())
         print("ac buttons shape",ac["buttons"].shape)
         print("ac camera shape",ac["camera"].shape)
         
