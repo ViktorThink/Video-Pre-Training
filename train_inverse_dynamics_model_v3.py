@@ -200,24 +200,27 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
         
         print("=== Predicting actions ===")
         pi_distribution = agent.predict_actions_training(frames)
+
         
         
         
         
-        loss = 0
         
         camera, buttons = recorded_actions_to_torch(recorded_actions)
-        
-        for i in range(n_frames):
-            camera_loss = pi_distribution["camera"][i]
-        
-            
-
         if _ == 0:
             print("pi_distribution",pi_distribution)
             print("\n\nrecorded_actions",recorded_actions)
             print("\n\ncamera",camera)
             print("\n\nbuttons",buttons)
+            
+            
+        loss = 0
+        for i in range(n_frames):
+            camera_loss = pi_distribution["camera"][i]
+        
+            
+
+
         raise
             
                     
