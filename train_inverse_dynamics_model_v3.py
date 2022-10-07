@@ -65,6 +65,28 @@ NOOP_ACTION = {
     "pickItem": 0,
 }
 
+
+used_buttons=["attack",
+   "back",
+    "forward",
+    "jump",
+    "left",
+    "right",
+    "sneak",
+    "sprint",
+    "use",
+    "drop",
+    "inventory",
+    "hotbar.1",
+    "hotbar.2",
+    "hotbar.3",
+    "hotbar.4",
+    "hotbar.5",
+    "hotbar.6",
+    "hotbar.7",
+    "hotbar.8",
+    "hotbar.9"]
+
 MESSAGE = """
 This script will take a video, predict actions for its frames and
 and show them with a cv2 window.
@@ -130,12 +152,12 @@ def recorded_actions_to_torch(recorded_actions):
     
     first=True
     for frame in recorded_actions:
-        frame_buttons=[]
+        frame_buttons=[0]*len(used_buttons)
         for key in frame.keys():
             if key == "camera":
                 camera.append(list(frame[key]))
             else:
-                frame_buttons.append(frame[key])
+                frame_buttons[used_buttons.index(key) = frame[key]
             if first==True:
                 print("key",key)
         if first ==True:
