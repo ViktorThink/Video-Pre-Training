@@ -180,32 +180,18 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
         
         
         print("=== Predicting actions ===")
-        predicted_actions = agent.predict_actions_training(frames)
+        pi_distribution = agent.predict_actions_training(frames)
         
         
         
-        keys = [a for a in predicted_actions.keys()]
+        
         loss = 0
-        button_action_tensor=[]
-        camera_action_tensor=[]
         
-        recorded_buttons_keys = [a for a in recorded_actions[0].keys()]
-        recorded_buttons_keys.remove("camera")
-        
-        for i in range(n_frames):
-            camera_action_tensor.append(recorded_actions[i]["camera"])
-            
-            frame_buttons=[]
-            for key in recorded_buttons_keys:
-                frame_buttons.append(recorded_actions[i][key])
-            button_action_tensor.append(frame_buttons)
             
 
         if _ == 0:
-            print("predicted_actions",keys)
-            print("predicted_actions",predicted_actions)
-            print("\n\ncamera_action_tensor",camera_action_tensor)
-            print("\n\button_action_tensor",button_action_tensor)
+            print("pi_distribution",pi_distribution)
+
             print("\n\nrecorded_actions",recorded_actions)
         raise
             
