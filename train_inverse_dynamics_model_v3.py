@@ -228,6 +228,9 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
         
         print("=== Predicting actions ===")
         pi_distribution = agent.predict_actions_training(frames)
+        
+        pi_camera=pi_distribution["camera"][0]
+        pi_buttons=pi_distribution["buttons"][0]
 
         
         
@@ -248,7 +251,18 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
             
         loss = 0
         for i in range(n_frames):
-            camera_loss = pi_distribution["camera"][0][i]
+            
+            camera_loss = loss_func(pi_camera[i], camera[i])
+            buttons_loss = loss_func(pi_buttons[i], buttons[i])
+            loss = loss + camera_loss + buttons_loss
+            
+            if i == 0:
+                print("pi_camera[i]",pi_camera[i])
+                print("camera[i]",camera[i])
+                print("camera_loss",camera_loss)
+                print("buttons[i]",buttons[i])
+                print("buttons_loss",buttons_loss)
+        print("Total loss",loss)
         
             
 
