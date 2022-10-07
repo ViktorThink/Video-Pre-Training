@@ -615,6 +615,9 @@ class InverseActionPolicy(nn.Module):
         **kwargs,
     ):
         (pd, _, _), state_out = self(obs=obs, **kwargs)
+        
+        return pd, state_out, None
+        
         print("PD",pd)
         print("Shape buttons",pd["buttons"].shape)
         print("Shape camera",pd["camera"].shape)
