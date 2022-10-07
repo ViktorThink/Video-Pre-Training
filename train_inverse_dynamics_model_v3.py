@@ -209,14 +209,17 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
         camera, buttons = recorded_actions_to_torch(recorded_actions)
         if _ == 0:
             print("pi_distribution",pi_distribution)
+            print("pi_distribution camera shape",pi_distribution["camera"].shape)
             print("\n\nrecorded_actions",recorded_actions)
             print("\n\ncamera",camera)
             print("\n\nbuttons",buttons)
+            print("\n\ncamera shape",camera.shape)
+            print("\n\nbuttons shape",buttons.shape)
             
             
         loss = 0
         for i in range(n_frames):
-            camera_loss = pi_distribution["camera"][i]
+            camera_loss = pi_distribution["camera"][0][i]
         
             
 
