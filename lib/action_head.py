@@ -248,9 +248,11 @@ class DictActionHead(nn.ModuleDict):
         return result
 
     def logprob(self, actions: torch.Tensor, logits: torch.Tensor) -> torch.Tensor:
+        print("doing logprob")
         return sum(subhead.logprob(actions[k], logits[k]) for k, subhead in self.items())
 
     def sample(self, logits: torch.Tensor, deterministic: bool = False) -> Any:
+        print("doing sample")
         return {k: subhead.sample(logits[k], deterministic) for k, subhead in self.items()}
 
     def entropy(self, logits: torch.Tensor) -> torch.Tensor:
