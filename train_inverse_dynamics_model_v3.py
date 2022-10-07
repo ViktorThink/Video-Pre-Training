@@ -210,6 +210,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
         if _ == 0:
             print("pi_distribution",pi_distribution)
             print("pi_distribution camera shape",pi_distribution["camera"].shape)
+            print("pi_distribution buttons shape",pi_distribution["buttons"].shape)
             print("\n\nrecorded_actions",recorded_actions)
             print("\n\ncamera",camera)
             print("\n\nbuttons",buttons)
