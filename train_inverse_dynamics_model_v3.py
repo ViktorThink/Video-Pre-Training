@@ -157,7 +157,7 @@ def recorded_actions_to_torch(recorded_actions):
             if key == "camera":
                 camera.append(list(frame[key]))
             else:
-                frame_buttons[used_buttons.index(key) = frame[key]
+                frame_buttons[used_buttons.index(key)] = frame[key]
             if first==True:
                 print("key",key)
         if first ==True:
