@@ -251,15 +251,25 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
             
         loss = 0
         for i in range(n_frames):
-            
-            camera_loss = loss_func(pi_camera[i], camera[i])
-            buttons_loss = loss_func(pi_buttons[i], buttons[i])
-            loss = loss + camera_loss + buttons_loss
+            try:
+                camera_loss = loss_func(pi_camera[i], camera[i])
+                buttons_loss = loss_func(pi_buttons[i], buttons[i])
+                loss = loss + camera_loss + 
+            except:
+                print("pi_camera[i]",pi_camera[i])
+                print("camera[i]",camera[i])
+                print("camera_loss",camera_loss)
+                
+                print("pi_buttons[i]",pi_buttons[i])
+                print("buttons[i]",buttons[i])
+                print("buttons_loss",buttons_loss)
             
             if i == 0:
                 print("pi_camera[i]",pi_camera[i])
                 print("camera[i]",camera[i])
                 print("camera_loss",camera_loss)
+                
+                print("pi_buttons[i]",pi_buttons[i])
                 print("buttons[i]",buttons[i])
                 print("buttons_loss",buttons_loss)
         print("Total loss",loss)
