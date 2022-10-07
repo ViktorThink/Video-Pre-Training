@@ -161,6 +161,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
         frames = np.stack(frames)
         print("=== Predicting actions ===")
         predicted_actions = agent.predict_actions(frames)
+        print("predicted_actions.items()",predicted_actions.items())
 
         for i in range(n_frames):
             frame = frames[i]
@@ -176,15 +177,16 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
             )
             for y, (action_name, action_array) in enumerate(predicted_actions.items()):
                 current_prediction = action_array[0, i]
-                cv2.putText(
-                    frame,
-                    f"{action_name}: {current_prediction} ({recorded_action[action_name]})",
-                    (10, 25 + y * 12),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.35,
-                    (255, 255, 255),
-                    1
-                )
+
+                # cv2.putText(
+                #     frame,
+                #     f"{action_name}: {current_prediction} ({recorded_action[action_name]})",
+                #     (10, 25 + y * 12),
+                #     cv2.FONT_HERSHEY_SIMPLEX,
+                #     0.35,
+                #     (255, 255, 255),
+                #     1
+                # )
             # RGB -> BGR again...
             cv2.imshow("MineRL IDM model predictions", frame[..., ::-1])
             cv2.waitKey(0)
