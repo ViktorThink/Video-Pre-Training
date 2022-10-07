@@ -618,19 +618,19 @@ class InverseActionPolicy(nn.Module):
         
         return pd, state_out, None
         
-        print("PD",pd)
-        print("Shape buttons",pd["buttons"].shape)
-        print("Shape camera",pd["camera"].shape)
+        # print("PD",pd)
+        # print("Shape buttons",pd["buttons"].shape)
+        # print("Shape camera",pd["camera"].shape)
         
-        print("deterministic:", deterministic)
+        # print("deterministic:", deterministic)
         ac = self.pi_head.sample(pd, deterministic=deterministic)
         log_prob= self.pi_head.logprob(ac, pd)
         
-        print("ac shape",ac)
-        print("ac buttons shape",ac["buttons"].shape)
-        print("ac camera shape",ac["camera"].shape)
-        print("log_prob",log_prob)
-        print("log_prob shape",log_prob.shape)
+        # print("ac shape",ac)
+        # print("ac buttons shape",ac["buttons"].shape)
+        # print("ac camera shape",ac["camera"].shape)
+        # print("log_prob",log_prob)
+        # print("log_prob shape",log_prob.shape)
 
         assert not th.isnan(log_prob).any()
 

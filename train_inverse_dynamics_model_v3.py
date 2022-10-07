@@ -124,6 +124,8 @@ def json_action_to_env_action(json_action):
 
     return env_action, is_null_action
 
+def recorded_actions_to_torch()
+
 
 def main(model, weights, video_path, json_path, n_batches, n_frames):
     print(MESSAGE)
@@ -159,7 +161,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
     weight_decay=WEIGHT_DECAY
     )
     
-    loss_func = th.nn.BCELoss()
+    loss_func = th.nn.CrossEntropyLoss()
 
     for _ in range(n_batches):
         th.cuda.empty_cache()
