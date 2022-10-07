@@ -124,7 +124,9 @@ def json_action_to_env_action(json_action):
 
     return env_action, is_null_action
 
-def recorded_actions_to_torch()
+def recorded_actions_to_torch():
+    camera
+    buttons
 
 
 def main(model, weights, video_path, json_path, n_batches, n_frames):
