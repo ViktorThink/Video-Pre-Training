@@ -254,7 +254,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
             try:
                 camera_loss = loss_func(pi_camera[i], camera[i])
                 buttons_loss = loss_func(pi_buttons[i], buttons[i])
-                loss = loss + camera_loss + 
+                loss = loss + camera_loss + buttons_loss
             except:
                 print("pi_camera[i]",pi_camera[i])
                 print("camera[i]",camera[i])
