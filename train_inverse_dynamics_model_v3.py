@@ -9,7 +9,7 @@ import cv2
 import numpy as np
 import json
 import torch as th
-
+import torch
 from agent import ENV_KWARGS
 from inverse_dynamics_model import IDMAgent
 
