@@ -128,7 +128,7 @@ def recorded_actions_to_torch(recorded_actions):
     camera = []
     buttons = []
     
-    
+    first=True
     for frame in recorded_actions:
         frame_buttons=[]
         for key in frame.keys():
@@ -136,6 +136,11 @@ def recorded_actions_to_torch(recorded_actions):
                 camera.append(list(frame[key]))
             else:
                 frame_buttons.append(frame[key])
+            if first==True:
+                print("key",key)
+        if first ==True:
+            print("frame_buttons",frame_buttons)
+            first=False
         buttons.append(frame_buttons)
     camera=torch.tensor(camera)
     buttons=torch.tensor(buttons)
