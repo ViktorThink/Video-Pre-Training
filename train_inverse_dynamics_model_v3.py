@@ -124,9 +124,24 @@ def json_action_to_env_action(json_action):
 
     return env_action, is_null_action
 
-def recorded_actions_to_torch():
-    camera
-    buttons
+def recorded_actions_to_torch(recorded_actions):
+    camera = []
+    buttons = []
+    
+    
+    for frame in recorded_actions:
+        frame_buttons=[]
+        for key in frame.keys():
+            if key == "camera":
+                camera.append(list(frame[key]))
+            else:
+                frame_buttons.append(frame[key])
+        buttons.append(frame_buttons)
+    camera=torch.tensor(camera)
+    buttons=torch.tensor(buttons)
+    return camera, buttons
+    
+
 
 
 def main(model, weights, video_path, json_path, n_batches, n_frames):
@@ -191,12 +206,15 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
         
         loss = 0
         
+        camera, buttons = recorded_actions_to_torch(recorded_actions)
+        
             
 
         if _ == 0:
             print("pi_distribution",pi_distribution)
-
             print("\n\nrecorded_actions",recorded_actions)
+            print("\n\ncamera",camera)
+            print("\n\nbuttons",buttons)
         raise
             
                     
