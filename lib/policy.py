@@ -600,7 +600,8 @@ class InverseActionPolicy(nn.Module):
 
         ac = self.pi_head.sample(pd, deterministic=deterministic)
         log_prob = self.pi_head.logprob(ac, pd)
-
+        print("ac buttons",ac["buttons"].tolist())
+        print("ac buttons shape",ac["buttons"].shape)
         assert not th.isnan(log_prob).any()
 
         result = {"log_prob": log_prob, "pd": pd}
