@@ -137,7 +137,7 @@ agent_settings = {'version': 1361,
                                        'use_pre_lstm_ln': False},
                               'function': 'ypt.model.inverse_action_model:InverseActionNet',
                               'local_args': {'hidsize': 128, 'impala_width': 1}},
-                      'pi_head_opts': {'temperature': 4}},
+                      'pi_head_opts': {'temperature': 1}},
                       'function': 'ypt.model.inverse_action_model:create'
                       },
 
