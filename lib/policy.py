@@ -628,10 +628,10 @@ class InverseActionPolicy(nn.Module):
         log_prob= self.pi_head.logprob(ac, pd)
         
         # print("ac",ac)
-        print("ac buttons",ac["buttons"].tolist())
-        print("ac camera",ac["camera"].tolist())
-        print("ac buttons shape",ac["buttons"].shape)
-        print("ac camera shape",ac["camera"].shape)
+        # print("ac buttons",ac["buttons"].tolist())
+        # print("ac camera",ac["camera"].tolist())
+        # print("ac buttons shape",ac["buttons"].shape)
+        # print("ac camera shape",ac["camera"].shape)
         
         
         return pd, state_out, None
