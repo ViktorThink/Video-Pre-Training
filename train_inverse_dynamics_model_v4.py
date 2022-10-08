@@ -140,9 +140,7 @@ agent_settings = {'version': 1361,
                       'pi_head_opts': {'temperature': 4}},
                       'function': 'ypt.model.inverse_action_model:create'
                       },
-                  'extra_args': {'ac_space': <DictType: Dict(buttons=D2[20], camera=D11[2])>,
-                                 'ob_space': <DictType: Dict(air=D23[], chest=D976[], diff_goal=D65[42], feet=D976[], food=D23[], head=D976[], img=D256[128,128,3], inventory=D2305[976], legs=D976[], life=D23[], mainhand_item=D976[], mask=Dict(craft=D2[977], equip=D2[977], place=D2[977]), offhand_item=D976[], saturation=D23[], xp=D23[])>
-                                 }
+
                   }
 
 def json_action_to_env_action(json_action):
