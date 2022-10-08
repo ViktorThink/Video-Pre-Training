@@ -212,11 +212,11 @@ def recorded_actions_to_torch(recorded_actions):
             else:
                 if key in used_buttons:
                     frame_buttons[used_buttons.index(key)] = frame[key]
-            if first==True:
-                print("key",key)
-        if first ==True:
-            print("frame_buttons",frame_buttons)
-            first=False
+        #     if first==True:
+        #         print("key",key)
+        # if first ==True:
+        #     # print("frame_buttons",frame_buttons)
+        #     first=False
         buttons.append(frame_buttons)
     camera=torch.tensor(camera)
     buttons=torch.tensor(buttons)
@@ -266,7 +266,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
     
     loss_func = th.nn.CrossEntropyLoss()
 
-    for _ in range(n_batches):
+    for step in range(n_batches):
         th.cuda.empty_cache()
         print("=== Loading up frames ===")
         frames = []
@@ -296,7 +296,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
         
         
         camera, buttons = recorded_actions_to_torch(recorded_actions)
-        if _ == 0:
+        if False:#_ == 0:
             print("pi_distribution",pi_distribution)
             print("pi_distribution camera shape",pi_distribution["camera"].shape)
             print("pi_distribution buttons shape",pi_distribution["buttons"].shape)
@@ -314,6 +314,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
                 buttons_loss = loss_func(pi_buttons[i], buttons[i])*10
                 loss = loss + camera_loss + buttons_loss
             except:
+                print("ERROR 3")
                 print("pi_camera[i]",pi_camera[i])
                 print("camera[i]",camera[i])
                 print("camera_loss",camera_loss)
@@ -322,7 +323,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
                 print("buttons[i]",buttons[i])
                 print("buttons_loss",buttons_loss)
             
-            if i == 0:
+            if False:#i == 0:
                 print("pi_camera[i]",pi_camera[i])
                 print("camera[i]",camera[i])
                 print("camera_loss",camera_loss)
@@ -330,6 +331,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
                 print("pi_buttons[i]",pi_buttons[i])
                 print("buttons[i]",buttons[i])
                 print("buttons_loss",buttons_loss)
+        print("Step:",step,end=" - ")
         print("Total loss",loss)
         
 
