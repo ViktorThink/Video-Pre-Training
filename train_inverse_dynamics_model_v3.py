@@ -87,6 +87,20 @@ used_buttons=["attack",
     "hotbar.8",
     "hotbar.9"]
 
+camera_bins=[-10,
+             -6,
+             -3,
+             -2,
+             -1,
+             0,
+             1,
+             2,
+             3,
+             6,
+             10
+             ]
+
+
 MESSAGE = """
 This script will take a video, predict actions for its frames and
 and show them with a cv2 window.
@@ -96,7 +110,7 @@ Press any button the window to proceed to the next frame.
 
 # Matches a number in the MineRL Java code regarding sensitivity
 # This is for mapping from recorded sensitivity to the one used in the model
-CAMERA_SCALER = 360.0 / 2400.0
+CAMERA_SCALER = 0.5 * 360.0 / 2400.0 # Needs calibration for sure
 
 
 def json_action_to_env_action(json_action):
@@ -146,6 +160,13 @@ def json_action_to_env_action(json_action):
 
     return env_action, is_null_action
 
+def find_closes_camera_value(value):
+    
+    array = np.array(camera_bins)
+    difference_array = np.absolute(array-v)
+    index = difference_array.argmin()
+    return index
+
 def recorded_actions_to_torch(recorded_actions):
     camera = []
     buttons = []
@@ -155,7 +176,9 @@ def recorded_actions_to_torch(recorded_actions):
         frame_buttons=[0]*len(used_buttons)
         for key in frame.keys():
             if key == "camera":
-                camera.append(list(frame[key]))
+                first_bin = find_closes_camera_value(list(frame[key])[0])
+                second_bin = find_closes_camera_value(list(frame[key])[1])
+                camera.append([first_bin,second_bin])
             else:
                 if key in used_buttons:
                     frame_buttons[used_buttons.index(key)] = frame[key]
