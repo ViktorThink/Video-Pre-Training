@@ -103,7 +103,7 @@ class DiagGaussianActionHead(ActionHead):
         return (log_std + 0.5 * (self.LOG2PI + 1)).sum(dim=-1)
 
     def sample(self, pd_params: torch.Tensor, deterministic: bool = False) -> torch.Tensor:
-        print("sample 106")
+        # print("sample 106")
         means = pd_params[..., 0]
         log_std = pd_params[..., 1]
 
@@ -194,7 +194,7 @@ class CategoricalActionHead(ActionHead):
         return entropy
 
     def sample(self, logits: torch.Tensor, deterministic: bool = False) -> Any:
-        print("sample 197")
+        # print("sample 197")
         if deterministic:
             return torch.argmax(logits, dim=-1)
         else:
@@ -250,11 +250,11 @@ class DictActionHead(nn.ModuleDict):
         return result
 
     def logprob(self, actions: torch.Tensor, logits: torch.Tensor) -> torch.Tensor:
-        print("doing logprob")
+        # print("doing logprob")
         return sum(subhead.logprob(actions[k], logits[k]) for k, subhead in self.items())
 
     def sample(self, logits: torch.Tensor, deterministic: bool = False) -> Any:
-        print("doing sample")
+        # print("doing sample")
         return {k: subhead.sample(logits[k], deterministic) for k, subhead in self.items()}
 
     def entropy(self, logits: torch.Tensor) -> torch.Tensor:
