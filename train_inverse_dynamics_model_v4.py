@@ -334,7 +334,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
         print("Step:",step,end=" - ")
         print("Total loss",loss)
         loss.backward()
-
+        agent.reset()
         #th.nn.utils.clip_grad_norm_(trainable_parameters, MAX_GRAD_NORM) #Applies gradient clipping
         if (step+1) % accumulation == 0:
             print("Optimizer step")
