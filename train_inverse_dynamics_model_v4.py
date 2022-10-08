@@ -225,7 +225,7 @@ def recorded_actions_to_torch(recorded_actions):
 
 
 
-def main(model, weights, video_path, json_path, n_batches, n_frames):
+def main(model, weights, video_path, json_path, n_batches, n_frames, accumulation):
     print(MESSAGE)
     if model == "":
         agent_parameters = agent_settings
@@ -333,7 +333,13 @@ def main(model, weights, video_path, json_path, n_batches, n_frames):
                 print("buttons_loss",buttons_loss)
         print("Step:",step,end=" - ")
         print("Total loss",loss)
-        
+        loss.backward()
+
+        #th.nn.utils.clip_grad_norm_(trainable_parameters, MAX_GRAD_NORM) #Applies gradient clipping
+        if (step+1) % accumulation == 0:
+            print("Optimizer step")
+            optimizer.step()
+            optimizer.zero_grad()
 
 
 if __name__ == "__main__":
@@ -345,7 +351,8 @@ if __name__ == "__main__":
     parser.add_argument("--jsonl-path", type=str, required=True, help="Path to a .jsonl file (Minecraft recording).")
     parser.add_argument("--n-frames", type=int, default=16, help="Number of frames to process at a time.")
     parser.add_argument("--n-batches", type=int, default=10, help="Number of batches (n-frames) to process for visualization.")
+    parser.add_argument("--batch-accumulaton", type=int, default=10, help="Number of batches to process before optimizer step.")
 
     args = parser.parse_args()
 
-    main(args.model, args.weights, args.video_path, args.jsonl_path, args.n_batches, args.n_frames)
+    main(args.model, args.weights, args.video_path, args.jsonl_path, args.n_batches, args.n_frames, args.accumulation)
