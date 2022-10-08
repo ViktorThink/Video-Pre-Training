@@ -132,7 +132,7 @@ agent_settings = {'version': 1361,
                                        'recurrence_is_residual': True,
                                        'recurrence_type': 'transformer',
                                        'single_output': True,
-                                       'timesteps': 128,
+                                       'timesteps': 16,
                                        'use_pointwise_layer': True,
                                        'use_pre_lstm_ln': False},
                               'function': 'ypt.model.inverse_action_model:InverseActionNet',
@@ -343,7 +343,7 @@ if __name__ == "__main__":
     parser.add_argument("--model", type=str, default="", required=False, help="Path to the '.model' file to be loaded.")
     parser.add_argument("--video-path", type=str, required=True, help="Path to a .mp4 file (Minecraft recording).")
     parser.add_argument("--jsonl-path", type=str, required=True, help="Path to a .jsonl file (Minecraft recording).")
-    parser.add_argument("--n-frames", type=int, default=128, help="Number of frames to process at a time.")
+    parser.add_argument("--n-frames", type=int, default=16, help="Number of frames to process at a time.")
     parser.add_argument("--n-batches", type=int, default=10, help="Number of batches (n-frames) to process for visualization.")
 
     args = parser.parse_args()
