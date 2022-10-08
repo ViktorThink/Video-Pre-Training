@@ -608,7 +608,7 @@ class InverseActionPolicy(nn.Module):
 
         return ac, state_out, result
     
-    @th.no_grad()
+    # @th.no_grad()
     def predict_train(
         self,
         obs,
