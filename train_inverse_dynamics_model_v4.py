@@ -268,7 +268,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
 
     for step in range(n_batches):
         th.cuda.empty_cache()
-        print("=== Loading up frames ===")
+        # print("=== Loading up frames ===")
         frames = []
         recorded_actions = []
         for _ in range(n_frames):
@@ -284,7 +284,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
         frames = np.stack(frames)
         
         
-        print("=== Predicting actions ===")
+        # print("=== Predicting actions ===")
         pi_distribution = agent.predict_actions_training(frames)
         
         pi_camera=pi_distribution["camera"][0]
