@@ -323,7 +323,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
                 print("buttons[i]",buttons[i])
                 print("buttons_loss",buttons_loss)
             
-            if i == 0:
+            if i == 0 and step % accumulation == 0:
                 print("pi_camera[i]",pi_camera[i])
                 print("camera[i]",camera[i])
                 print("camera_loss",camera_loss)
