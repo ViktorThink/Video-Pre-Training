@@ -163,7 +163,7 @@ def json_action_to_env_action(json_action):
 def find_closes_camera_value(value):
     
     array = np.array(camera_bins)
-    difference_array = np.absolute(array-v)
+    difference_array = np.absolute(array-value)
     index = difference_array.argmin()
     return index
 
