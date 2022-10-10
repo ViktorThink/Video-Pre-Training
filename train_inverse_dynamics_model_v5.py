@@ -292,7 +292,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
             json_data = json.loads(json_data)
         
         print("Training on: ", video_tuple[0],end= " - ")
-        print("Num frames: ", len(json_data),end= " - ")
+        print("Num frames: ", len(json_data))
             
             
         
