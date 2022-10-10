@@ -12,7 +12,7 @@ import torch as th
 import torch
 from agent import ENV_KWARGS
 from inverse_dynamics_model import IDMAgent
-
+import random
 
 KEYBOARD_BUTTON_MAPPING = {
     "key.keyboard.escape" :"ESC",
@@ -235,6 +235,7 @@ def load_data_path(video_path):
             video_path = os.path.abspath(os.path.join(dataset_dir, unique_id + ".mp4"))
             json_path = os.path.abspath(os.path.join(dataset_dir, unique_id + ".jsonl"))
             demonstration_tuples.append((video_path, json_path))
+        random.shuffle(demonstration_tuples)
         return demonstration_tuples
 
 
@@ -285,7 +286,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
             json_lines = json_file.readlines()
             json_data = "[" + ",".join(json_lines) + "]"
             json_data = json.loads(json_data)
-        for json_index in range(0, len(json_data),16)
+        for json_index in range(0, len(json_data),16):
         
             step=step+1
             th.cuda.empty_cache()
