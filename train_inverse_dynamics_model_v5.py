@@ -343,8 +343,8 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
             loss = 0
             for i in range(n_frames):
                 try:
-                    camera_loss = loss_func(pi_camera[i], camera[i])
-                    buttons_loss = loss_func(pi_buttons[i], buttons[i])*10
+                    camera_loss = loss_func(pi_camera[i], camera[i].to(device))
+                    buttons_loss = loss_func(pi_buttons[i], buttons[i].to(device))*10
                     loss = loss + camera_loss + buttons_loss
                 except:
                     print("ERROR 3")
