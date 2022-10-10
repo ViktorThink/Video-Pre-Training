@@ -226,7 +226,7 @@ def recorded_actions_to_torch(recorded_actions):
     
 
 
-def load_data_path(video_path):
+def load_data_path(dataset_dir):
     
         unique_ids = glob.glob(os.path.join(dataset_dir, "*.mp4"))
         unique_ids = list(set([os.path.basename(x).split(".")[0] for x in unique_ids]))
@@ -255,7 +255,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
     if weights != "":
         agent.load_weights(weights)
         
-        
+    print("video path",video_path)
     if not ".mp4" in video_path:
         demonstration_tuples = [(video_path, json_path)]
     else:
