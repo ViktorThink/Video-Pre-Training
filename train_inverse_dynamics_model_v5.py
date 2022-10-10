@@ -240,7 +240,7 @@ def load_data_path(dataset_dir):
         return demonstration_tuples
 
 
-def main(model, weights, video_path, json_path, n_batches, n_frames, accumulation):
+def main(model, weights, video_path, json_path, n_batches, n_frames, accumulation, out_weights):
     print(MESSAGE)
     if model == "":
         agent_parameters = agent_settings
@@ -312,7 +312,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
                 # BGR -> RGB
                 frames.append(frame[..., ::-1])
                 env_action, _ = json_action_to_env_action(json_data[json_index])
-                print("Json index",json_index)
+                # print("Json index",json_index)
                 recorded_actions.append(env_action)
                 json_index += 1
             frames = np.stack(frames)
@@ -374,6 +374,10 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
                 print("Optimizer step")
                 optimizer.step()
                 optimizer.zero_grad()
+                
+    if out_weights:
+        state_dict = agent.state_dict()
+        th.save(state_dict, out_weights)
 
 
 if __name__ == "__main__":
@@ -386,7 +390,8 @@ if __name__ == "__main__":
     parser.add_argument("--n-frames", type=int, default=16, help="Number of frames to process at a time.")
     parser.add_argument("--n-batches", type=int, default=10, help="Number of batches (n-frames) to process for visualization.")
     parser.add_argument("--batch-accumulaton", type=int, default=10, help="Number of batches to process before optimizer step.")
+    parser.add_argument("--out_weights",  default="", type=str,help="Name to save weights as")
 
     args = parser.parse_args()
 
-    main(args.model, args.weights, args.video_path, args.jsonl_path, args.n_batches, args.n_frames, args.batch_accumulaton)
+    main(args.model, args.weights, args.video_path, args.jsonl_path, args.n_batches, args.n_frames, args.batch_accumulaton, args.out_weights)
