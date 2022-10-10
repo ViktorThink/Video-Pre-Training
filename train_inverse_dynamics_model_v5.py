@@ -257,9 +257,10 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
     print("video path",video_path)
     if ".mp4" in video_path:
         demonstration_tuples = [(video_path, json_path)]
-        print("Number of clips:",len(demonstration_tuples))
+        
     else:
         demonstration_tuples = load_data_path(video_path)
+        print("Number of clips:",len(demonstration_tuples))
     required_resolution = ENV_KWARGS["resolution"]
 
         
