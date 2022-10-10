@@ -284,6 +284,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
     step = 0
     for video_tuple in demonstration_tuples:
         cap = cv2.VideoCapture(video_tuple[0])
+        print("Training on: ", video_tuple[0])
         json_index = 0
         with open(video_tuple[1]) as json_file:
             json_lines = json_file.readlines()
