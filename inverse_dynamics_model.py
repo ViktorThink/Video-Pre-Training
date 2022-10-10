@@ -26,7 +26,6 @@ class IDMAgent:
     def __init__(self, idm_net_kwargs, pi_head_kwargs, device=None):
         if device is None:
             device = default_device_type()
-        device="cpu"
         self.device = th.device(device)
         # Set the default torch device for underlying code as well
         set_default_torch_device(self.device)

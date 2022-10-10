@@ -249,7 +249,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
     net_kwargs = agent_parameters["model"]["args"]["net"]["args"]
     pi_head_kwargs = agent_parameters["model"]["args"]["pi_head_opts"]
     pi_head_kwargs["temperature"] = float(pi_head_kwargs["temperature"])
-    agent = IDMAgent(idm_net_kwargs=net_kwargs, pi_head_kwargs=pi_head_kwargs).to(device)
+    agent = IDMAgent(idm_net_kwargs=net_kwargs, pi_head_kwargs=pi_head_kwargs,device = device)
     
     if weights != "":
         agent.load_weights(weights)
