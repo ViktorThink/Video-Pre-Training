@@ -230,7 +230,6 @@ def load_data_path(dataset_dir):
     
         unique_ids = glob.glob(os.path.join(dataset_dir, "*.mp4"))
         unique_ids = list(set([os.path.basename(x).split(".")[0] for x in unique_ids]))
-        self.unique_ids = unique_ids
         # Create tuples of (video_path, json_path) for each unique_id
         demonstration_tuples = []
         for unique_id in unique_ids:
@@ -372,7 +371,7 @@ if __name__ == "__main__":
     parser.add_argument("--weights", type=str, default="", required=False, help="Path to the '.weights' file to be loaded.")
     parser.add_argument("--model", type=str, default="", required=False, help="Path to the '.model' file to be loaded.")
     parser.add_argument("--video-path", type=str, required=True, help="Path to a .mp4 file (Minecraft recording).")
-    parser.add_argument("--jsonl-path", type=str, required=True, help="Path to a .jsonl file (Minecraft recording).")
+    parser.add_argument("--jsonl-path", type=str, default=None, required=False, help="Path to a .jsonl file (Minecraft recording).")
     parser.add_argument("--n-frames", type=int, default=16, help="Number of frames to process at a time.")
     parser.add_argument("--n-batches", type=int, default=10, help="Number of batches (n-frames) to process for visualization.")
     parser.add_argument("--batch-accumulaton", type=int, default=10, help="Number of batches to process before optimizer step.")
