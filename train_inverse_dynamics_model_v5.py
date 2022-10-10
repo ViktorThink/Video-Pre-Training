@@ -240,7 +240,7 @@ def load_data_path(dataset_dir):
         return demonstration_tuples
 
 
-def main(model, weights, video_path, json_path, n_batches, n_frames, accumulation, out_weights):
+def main(model, weights, video_path, json_path, n_batches, n_frames, accumulation, out_weights, device):
     print(MESSAGE)
     if model == "":
         agent_parameters = agent_settings
@@ -249,7 +249,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
     net_kwargs = agent_parameters["model"]["args"]["net"]["args"]
     pi_head_kwargs = agent_parameters["model"]["args"]["pi_head_opts"]
     pi_head_kwargs["temperature"] = float(pi_head_kwargs["temperature"])
-    agent = IDMAgent(idm_net_kwargs=net_kwargs, pi_head_kwargs=pi_head_kwargs)
+    agent = IDMAgent(idm_net_kwargs=net_kwargs, pi_head_kwargs=pi_head_kwargs).to(device)
     
     if weights != "":
         agent.load_weights(weights)
@@ -297,7 +297,6 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
             
         
         for json_index in range(0, len(json_data)-16,16):
-            print()
         
             step=step+1
             th.cuda.empty_cache()
@@ -391,7 +390,8 @@ if __name__ == "__main__":
     parser.add_argument("--n-batches", type=int, default=10, help="Number of batches (n-frames) to process for visualization.")
     parser.add_argument("--batch-accumulaton", type=int, default=10, help="Number of batches to process before optimizer step.")
     parser.add_argument("--out_weights",  default="", type=str,help="Name to save weights as")
+    parser.add_argument("--device",  default="cpu", type=str,help="Specify either cpu or cuda")
 
     args = parser.parse_args()
 
-    main(args.model, args.weights, args.video_path, args.jsonl_path, args.n_batches, args.n_frames, args.batch_accumulaton, args.out_weights)
+    main(args.model, args.weights, args.video_path, args.jsonl_path, args.n_batches, args.n_frames, args.batch_accumulaton, args.out_weights, args.device)
