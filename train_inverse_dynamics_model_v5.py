@@ -256,7 +256,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
         agent.load_weights(weights)
         
     print("video path",video_path)
-    if not ".mp4" in video_path:
+    if ".mp4" in video_path:
         demonstration_tuples = [(video_path, json_path)]
     else:
         demonstration_tuples = load_data_path(video_path)
