@@ -13,6 +13,8 @@ import torch
 from agent import ENV_KWARGS
 from inverse_dynamics_model import IDMAgent
 import random
+import glob
+
 
 KEYBOARD_BUTTON_MAPPING = {
     "key.keyboard.escape" :"ESC",
