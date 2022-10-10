@@ -375,7 +375,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
                 optimizer.zero_grad()
                 
     if out_weights:
-        state_dict = agent.state_dict()
+        state_dict = agent.policy.state_dict()
         th.save(state_dict, out_weights)
 
 
