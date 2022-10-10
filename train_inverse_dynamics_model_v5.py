@@ -296,7 +296,8 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
             
             
         
-        for json_index in range(0, len(json_data),16):
+        for json_index in range(0, len(json_data)-16,16):
+            print()
         
             step=step+1
             th.cuda.empty_cache()
@@ -311,6 +312,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
                 # BGR -> RGB
                 frames.append(frame[..., ::-1])
                 env_action, _ = json_action_to_env_action(json_data[json_index])
+                print("Json index",json_index)
                 recorded_actions.append(env_action)
                 json_index += 1
             frames = np.stack(frames)
