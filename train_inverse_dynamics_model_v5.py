@@ -257,6 +257,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
     print("video path",video_path)
     if ".mp4" in video_path:
         demonstration_tuples = [(video_path, json_path)]
+        print("Number of clips:",len(demonstration_tuples))
     else:
         demonstration_tuples = load_data_path(video_path)
     required_resolution = ENV_KWARGS["resolution"]
@@ -281,9 +282,9 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
     loss_func = th.nn.CrossEntropyLoss()
     step = 0
     for video_tuple in demonstration_tuples:
-        cap = cv2.VideoCapture(video_path)
+        cap = cv2.VideoCapture(video_tuple[0])
         json_index = 0
-        with open(json_path) as json_file:
+        with open(video_tuple[1]) as json_file:
             json_lines = json_file.readlines()
             json_data = "[" + ",".join(json_lines) + "]"
             json_data = json.loads(json_data)
