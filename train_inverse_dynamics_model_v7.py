@@ -250,7 +250,8 @@ class Data_Loader():
             w = self.new_worker()
             if w:
                 self.workers.append(w)
-            
+        print("n_workers",n_workers)
+        print("self.workers",len(self.workers))
         self.n_frames=n_frames
             
         self.next_worker=0
@@ -270,7 +271,7 @@ class Data_Loader():
     
     
     def update_worker(self):
-        if self.next_worker < self.n_workers:
+        if self.next_worker+1 < self.n_workers:
             self.next_worker = self.next_worker + 1
         else:
             self.next_worker = 0
