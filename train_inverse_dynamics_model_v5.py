@@ -318,8 +318,6 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
             
             
             # print("=== Predicting actions ===")
-            print("frames",frames)
-            raise
             pi_distribution = agent.predict_actions_training(frames)
             
             pi_camera=pi_distribution["camera"][0]
