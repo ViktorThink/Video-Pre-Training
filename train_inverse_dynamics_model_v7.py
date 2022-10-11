@@ -288,7 +288,7 @@ class Data_Loader():
         
         
         
-        if worker["json_data"] >= worker["index"] + self.n_frames:
+        if len(worker["json_data"]) >= worker["index"] + self.n_frames:
             
         
             frames = []
