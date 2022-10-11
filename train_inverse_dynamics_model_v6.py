@@ -317,7 +317,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
             
             
             camera, buttons = recorded_actions_to_torch(batch_actions)
-            if batch_i == 0:
+            if step == 0:
                 print("pi_distribution",pi_distribution)
                 print("pi_distribution camera shape",pi_distribution["camera"].shape)
                 print("pi_distribution buttons shape",pi_distribution["buttons"].shape)
