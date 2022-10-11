@@ -298,7 +298,7 @@ class Data_Loader():
                 ret, frame = cap.read()
                 if not ret:
                     break
-                assert frame.shape[0] == self.required_resolution[1] and frame.shape[1] == required_resolution[0], "Video must be of resolution {}".format(required_resolution)
+                assert frame.shape[0] == self.required_resolution[1] and frame.shape[1] == self.required_resolution[0], "Video must be of resolution {}".format(self.required_resolution)
                 frames.append(frame[..., ::-1])
                 env_action, _ = json_action_to_env_action(json_data[json_index])
                 recorded_actions.append(env_action)
