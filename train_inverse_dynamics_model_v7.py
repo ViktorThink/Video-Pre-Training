@@ -240,9 +240,10 @@ def load_data_path(dataset_dir):
         return demonstration_tuples
 
 class Data_Loader():
-    def __init__(self, demonstration_tuples, n_workers=1, n_frames=16):
+    def __init__(self, demonstration_tuples,required_resolution, n_workers=1, n_frames=16):
         self.demonstration_tuples = demonstration_tuples
         self.n_workers= n_workers
+        self.required_resolution = required_resolution
     
         self.workers=[]
         for i in range(self.n_workers):
@@ -297,7 +298,7 @@ class Data_Loader():
                 ret, frame = cap.read()
                 if not ret:
                     break
-                assert frame.shape[0] == required_resolution[1] and frame.shape[1] == required_resolution[0], "Video must be of resolution {}".format(required_resolution)
+                assert frame.shape[0] == self.required_resolution[1] and frame.shape[1] == required_resolution[0], "Video must be of resolution {}".format(required_resolution)
                 frames.append(frame[..., ::-1])
                 env_action, _ = json_action_to_env_action(json_data[json_index])
                 recorded_actions.append(env_action)
@@ -365,7 +366,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
     )
     
     
-    data_loader = Data_Loader(demonstration_tuples, n_workers=n_workers, n_frames=n_frames)
+    data_loader = Data_Loader(demonstration_tuples,required_resolution=required_resolution, n_workers=n_workers, n_frames=n_frames)
     
     loss_func = th.nn.CrossEntropyLoss()
     step = 0
