@@ -296,6 +296,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
             
         
     for batch_i, (batch_images, batch_actions, batch_episode_id) in enumerate(data_loader):
+            print("batch_episode_id",batch_episode_id)
         
             step=step+1
             th.cuda.empty_cache()
@@ -318,7 +319,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
             
             
             camera, buttons = recorded_actions_to_torch(batch_actions)
-            if True:# _ == 0:
+            if False:# _ == 0:
                 print("pi_distribution",pi_distribution)
                 print("pi_distribution camera shape",pi_distribution["camera"].shape)
                 print("pi_distribution buttons shape",pi_distribution["buttons"].shape)
@@ -345,7 +346,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
                     print("buttons[i]",buttons[i])
                     print("buttons_loss",buttons_loss)
                 
-                if False:#i == 0 and step % accumulation == 0:
+                if i == 0 and step % accumulation == 0:
                     print("pi_camera[i]",pi_camera[i])
                     print("camera[i]",camera[i])
                     print("camera_loss",camera_loss)
