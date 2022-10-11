@@ -284,7 +284,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
     
     data_loader = DataLoader(
         dataset_dir=video_path,
-        n_workers=1,
+        n_workers=n_frames,
         batch_size=n_frames,
         n_epochs=epochs
     )
