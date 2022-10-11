@@ -377,7 +377,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
         step=step+1
         
         frames, recorded_actions, worker_num = data_loader.next()
-        if frames == None:
+        if frames:
             break
         th.cuda.empty_cache()
         
