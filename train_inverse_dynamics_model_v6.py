@@ -304,7 +304,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
             
             # print("=== Predicting actions ===")
             for i in range(len(batch_images)):
-                batch_images[i] = list(batch_images[i])
+                batch_images[i] = batch_images[i].tolist()
             print("batch_images",batch_images)
             pi_distribution = agent.predict_actions_training(batch_images)
             
