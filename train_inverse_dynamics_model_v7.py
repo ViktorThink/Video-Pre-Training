@@ -241,7 +241,7 @@ def load_data_path(dataset_dir):
 
 class Data_Loader():
     def __init__(self, demonstration_tuples, n_workers=1, n_frames=16):
-        self.demonstration_tuples
+        self.demonstration_tuples = demonstration_tuples
         self.n_workers= n_workers
     
         self.workers=[]
