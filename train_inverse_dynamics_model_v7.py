@@ -240,7 +240,7 @@ def load_data_path(dataset_dir):
         return demonstration_tuples
 
 class data_loader():
-  def __init__(self, demonstration_tuples, n_workers=1, n_frames=16):
+    def __init__(self, demonstration_tuples, n_workers=1, n_frames=16):
         self.demonstration_tuples
         self.n_workers= n_workers
     
@@ -278,7 +278,9 @@ class data_loader():
         if self.n_workers==[]:
             return None, None
         
-        worker=self.workers[self.next_worker]
+        worker_num = self.next_worker
+        
+        worker=self.workers[worker_num]
         
         
         json_data=worker["json_data"]
@@ -302,20 +304,22 @@ class data_loader():
                 
             frames = np.stack(frames)
             worker["index"] += 16
+            worker["cap"] = cap
+            self.workers[worker_num] = worker
+            self.update_worker()
+            return frames, recorded_actions, worker_num
             
         
         else:
             worker = self.new_worker()
             if worker:
-                self.workers[self.next_worker] = worker
+                self.workers[worker_num] = worker
             else:
-                del self.workers[self.next_worker]
+                del self.workers[worker_num]
             return self.next()
         
                 
-        self.workers[self.next_worker] = worker
-        self.update_worker()
-        return frames, recorded_actions
+
         
 
     
