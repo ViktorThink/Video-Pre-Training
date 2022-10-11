@@ -290,15 +290,13 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
     )
     
     loss_func = th.nn.CrossEntropyLoss()
-    step = 0
 
             
             
         
-    for batch_i, (batch_images, batch_actions, batch_episode_id) in enumerate(data_loader):
+    for step, (batch_images, batch_actions, batch_episode_id) in enumerate(data_loader):
             print("batch_episode_id",batch_episode_id)
         
-            step=step+1
             th.cuda.empty_cache()
 
             
@@ -319,7 +317,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
             
             
             camera, buttons = recorded_actions_to_torch(batch_actions)
-            if False:# _ == 0:
+            if batch_i == 0:
                 print("pi_distribution",pi_distribution)
                 print("pi_distribution camera shape",pi_distribution["camera"].shape)
                 print("pi_distribution buttons shape",pi_distribution["buttons"].shape)
@@ -346,7 +344,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
                     print("buttons[i]",buttons[i])
                     print("buttons_loss",buttons_loss)
                 
-                if i == 0:# or step % accumulation == 0:
+                if i == 0 and step % accumulation == 0:
                     print("pi_camera[i]",pi_camera[i])
                     print("camera[i]",camera[i])
                     print("camera_loss",camera_loss)
@@ -355,7 +353,6 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
                     print("buttons[i]",buttons[i])
                     print("buttons_loss",buttons_loss)
             print("Step:",step,end=" - ")
-            print("Step:",batch_i,end=" - ")
             print("Total loss",loss)
             loss.backward()
             agent.reset()
