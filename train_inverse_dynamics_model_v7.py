@@ -250,8 +250,7 @@ class Data_Loader():
             w = self.new_worker()
             if w:
                 self.workers.append(w)
-        print("n_workers",n_workers)
-        print("self.workers",len(self.workers))
+
         self.n_frames=n_frames
             
         self.next_worker=0
@@ -378,7 +377,6 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
         step=step+1
         
         frames, recorded_actions, worker_num = data_loader.next()
-        print("worker_num",worker_num)
         if type(frames) == type(None):
             break
         th.cuda.empty_cache()
