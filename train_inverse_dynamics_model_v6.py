@@ -303,6 +303,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
             
             
             # print("=== Predicting actions ===")
+            batch_images = th.tensor(batch_images)
             print("batch_images",batch_images)
             pi_distribution = agent.predict_actions_training(batch_images)
             
