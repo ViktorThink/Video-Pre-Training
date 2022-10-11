@@ -105,6 +105,7 @@ def behavioural_cloning_train(data_dir, in_model, in_weights, out_weights):
 
     loss_sum = 0
     for batch_i, (batch_images, batch_actions, batch_episode_id) in enumerate(data_loader):
+        print("batch_episode_id",batch_episode_id)
         batch_loss = 0
         for image, action, episode_id in zip(batch_images, batch_actions, batch_episode_id):
             agent_action = agent._env_action_to_agent(action, to_torch=True, check_if_null=True)
