@@ -438,6 +438,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
     if out_weights:
         state_dict = agent.policy.state_dict()
         th.save(state_dict, out_weights)
+        print("Model saved")
 
 
 if __name__ == "__main__":
