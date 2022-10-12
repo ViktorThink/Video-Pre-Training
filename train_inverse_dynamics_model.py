@@ -276,9 +276,9 @@ class Data_Loader():
             self.next_worker = 0
     
     def next(self):
-        if self.n_workers==[]:
+        if self.n_workers==0:
             return None, None
-        
+            
         worker_num = self.next_worker
         
         worker=self.workers[worker_num]
@@ -390,7 +390,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
 
 
         camera, buttons = recorded_actions_to_torch(recorded_actions)
-        if False:# _ == 0:
+        if verbose and step == 0:
             print("pi_distribution",pi_distribution)
             print("pi_distribution camera shape",pi_distribution["camera"].shape)
             print("pi_distribution buttons shape",pi_distribution["buttons"].shape)
