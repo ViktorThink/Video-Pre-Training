@@ -326,7 +326,7 @@ class Data_Loader():
 
     
     
-def main(model, weights, video_path, json_path, n_batches, n_frames, accumulation, out_weights, device, n_workers):
+def main(model, weights, video_path, json_path, n_batches, n_frames, accumulation, out_weights, device, n_workers, verbose=False):
     print(MESSAGE)
     if model == "":
         agent_parameters = agent_settings
@@ -417,7 +417,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
                 print("buttons[i]",buttons[i])
                 print("buttons_loss",buttons_loss)
             
-            if False:#i == 0 and step % accumulation == 0:
+            if verbose and i == 0 and step % accumulation == 0:
                 print("pi_camera[i]",pi_camera[i])
                 print("camera[i]",camera[i])
                 print("camera_loss",camera_loss)
@@ -426,7 +426,7 @@ def main(model, weights, video_path, json_path, n_batches, n_frames, accumulatio
                 print("buttons[i]",buttons[i])
                 print("buttons_loss",buttons_loss)
         print("Step:",step,end=" - ")
-        print("Total loss",loss)
+        print("Total loss",loss.item())
         loss.backward()
         agent.reset()
         #th.nn.utils.clip_grad_norm_(trainable_parameters, MAX_GRAD_NORM) #Applies gradient clipping
@@ -453,7 +453,8 @@ if __name__ == "__main__":
     parser.add_argument("--out_weights",  default="", type=str,help="Name to save weights as")
     parser.add_argument("--device",  default="cpu", type=str,help="Specify either cpu or cuda")
     parser.add_argument("--n_workers",  default=1, type=int,help="Number of clips to train on in parallel")
+    parser.add_argument("--verbose",  default=False, type=str,help="False by default, pass string to output extra info about tensors during training.")
 
     args = parser.parse_args()
 
-    main(args.model, args.weights, args.video_path, args.jsonl_path, args.n_batches, args.n_frames, args.batch_accumulaton, args.out_weights, args.device,args.n_workers)
+    main(args.model, args.weights, args.video_path, args.jsonl_path, args.n_batches, args.n_frames, args.batch_accumulaton, args.out_weights, args.device,args.n_workers, verbose=args.verbose)
