@@ -463,5 +463,16 @@ class InverseActionPolicy(nn.Module):
 
         return ac, state_out, result
 
+    def predict_train(
+        self,
+        obs,
+        deterministic: bool = True,
+        **kwargs,
+    ):
+        (pd, _, _), state_out = self(obs=obs, **kwargs)
+        
+        return pd, state_out, None
+
+
     def initial_state(self, batch_size: int):
         return self.net.initial_state(batch_size)
