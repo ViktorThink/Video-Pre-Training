@@ -278,7 +278,11 @@ class Data_Loader():
     def next(self):
         if self.n_workers==0:
             return None, None, None
+        
+        if self.next_worker >= len(self.workers):
+            self.update_worker()
             
+        
         worker_num = self.next_worker
         
         worker=self.workers[worker_num]
